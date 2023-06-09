@@ -1,21 +1,41 @@
+<script setup>
+import {ref} from 'vue'
+// 获取表单
+const formDom = ref(null)
+// 登录表单数据
+const loginForm = ref({
+  username:'',
+  password:'',
+  isAgree:true
+})
+// 校验规则
+const loginRules = ({
+    username:[{required:true,message:'用户名不能为空',trigger:'blur'}],
+    password:[{required:true,message:'密码不能为空',trigger:'blur'}],
+})
+// 点击登录
+const onFinish = () => {
+  formDom.value.resetFields()
+}
+</script>
 <template>
   <div class="body">
     <div class="loginBg"></div>
     <div class="loginForm">
       <h3 class="loginTitle">智慧园区-登录</h3>
-      <a-card class="login-card">
-         <a-form layout="vertical">
-          <a-form-item label="账号" :label-col="{ span: 4 }" :wrapper-col="{ span: 24 }" labelAlign="left" layout="vertical">
-            <a-input style="width: 100%;"></a-input>
+      <a-card class="login-card" ref="formDom">
+         <a-form layout="vertical" :model="loginForm" :rules="loginRules" @finish="onFinish">
+          <a-form-item label="账号" :label-col="{ span: 4 }" :wrapper-col="{ span: 24 }" name="username">
+            <a-input style="width: 100%;" v-model:value="loginForm.username"></a-input>
           </a-form-item>
-          <a-form-item label="密码" :label-col="{ span: 4 }" :wrapper-col="{ span: 24 }" labelAlign="left" layout="vertical">
-            <a-input-password style="width: 100%;"></a-input-password>
+          <a-form-item label="密码" :label-col="{ span: 4 }" :wrapper-col="{ span: 24 }" name="password">
+            <a-input-password style="width: 100%;" v-model:value="loginForm.password"></a-input-password>
+          </a-form-item>
+          <a-form-item name="isAgree">
+            <a-checkbox v-model:checked="loginForm.isAgree">记住我</a-checkbox>
           </a-form-item>
           <a-form-item>
-            <a-checkbox>记住我</a-checkbox>
-          </a-form-item>
-          <a-form-item>
-            <a-button type="primary" style="width: 100%;border-radius: 4px;">登录</a-button>
+            <a-button type="primary" style="width: 100%;border-radius: 4px;" html-type="submit">登录</a-button>
           </a-form-item>
          </a-form>
          <p style="color: red;">仅用于IT培训教学使用,为保障您的个人信息安全,请勿向平台录入任何个人敏感信息（如手机号、身份证号等）！</p>
