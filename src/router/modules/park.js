@@ -4,7 +4,7 @@ export default {
   path: '/park',
   component: Layout,
   redirect: '/park/StoreyPage',
-  meta: { title: '园区管理'},
+  meta: { title: '园区管理',icon:'https://yjy-teach-oss.oss-cn-beijing.aliyuncs.com/smartPark/menu/image/park.png'},
   children: [
     // 区域管理
     {

@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import sideBar from './components/sideBar.vue';
+import NavBar from './components/NavBar.vue';
 const collapsed = ref(false)
 </script>
 
@@ -12,7 +13,7 @@ const collapsed = ref(false)
     </a-layout-sider>
     <a-layout class="right-layout">
       <a-layout-header>
-        顶部内容
+        <NavBar></NavBar>
       </a-layout-header>
       <a-layout-content>
         <RouterView></RouterView>
@@ -45,9 +46,9 @@ const collapsed = ref(false)
   .ant-layout-header {
     background-color: #f4f6f8;
     padding: 0 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    // display: flex;
+    // align-items: center;
+    // justify-content: space-between;
     .anticon {
       font-size: 20px;
       cursor: pointer;

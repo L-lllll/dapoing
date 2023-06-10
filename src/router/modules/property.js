@@ -4,6 +4,7 @@ export default {
   path: '/property',
   component: Layout,
   redirect: '/property/propertyfee',
+  meta: { title: '物业费管理',icon:'https://yjy-teach-oss.oss-cn-beijing.aliyuncs.com/smartPark/menu/image/propety.png'},
   children: [
     // 区域管理
     {

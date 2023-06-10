@@ -4,7 +4,7 @@ export default {
   path: '/one',
   component: Layout,
   redirect: '/one/swingRod',
-  meta: { title: '一体杆管理'},
+  meta: { title: '一体杆管理',icon:'https://yjy-teach-oss.oss-cn-beijing.aliyuncs.com/smartPark/menu/image/rod.png'},
   children: [
     // 区域管理
     {

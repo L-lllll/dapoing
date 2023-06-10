@@ -4,7 +4,7 @@ export default {
   path: '/car',
   component: Layout,
   redirect: '/car/area',
-  meta: { title: '行车管理'},
+  meta: { title: '行车管理',icon:'https://yjy-teach-oss.oss-cn-beijing.aliyuncs.com/smartPark/menu/image/car.png'},
   children: [
     // 区域管理
     {

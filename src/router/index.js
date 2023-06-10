@@ -18,6 +18,10 @@ const router = createRouter({
       path: '/',
       redirect: '/dashboard',
       component: Layout,
+      meta: {
+        title: '工作台',
+        icon: 'https://yjy-teach-oss.oss-cn-beijing.aliyuncs.com/smartPark/menu/image/workbench.png'
+      },
       // 子节点
       children: [
         {
@@ -26,7 +30,7 @@ const router = createRouter({
           // 路由元信息
           meta: {
             title: '工作台',
-            icon: 'HomeOutlined'
+            icon: 'https://yjy-teach-oss.oss-cn-beijing.aliyuncs.com/smartPark/menu/image/workbench.png'
           }
         }
       ]

@@ -25,7 +25,7 @@ const getMeta = (obj) => {
         <a-sub-menu v-if="item.children && item.children.length > 1" :key="item.path">
           <template #title>
             <!-- 一级标签icon -->
-            <component :is="getMeta(item).icon" />
+            <img style="height:18px;width:18px;margin-right: 10px;" :src="item.meta.icon" alt="">
             <!-- 一级标签名 -->
             <span>{{ item.meta.title }}</span>
           </template>
@@ -35,7 +35,6 @@ const getMeta = (obj) => {
             <a-menu-item v-if="!child.hidden" :key="child.path">
               <!-- 设置路由跳转路径 -->
               <router-link class="link-name" :to="child.path">
-                <component :is="getMeta(child).icon" />
                 <span>{{ getMeta(child).title }}</span>
               </router-link>
             </a-menu-item>
@@ -44,7 +43,7 @@ const getMeta = (obj) => {
         <!-- 如果当前路由没有子节点，就直接渲染一个 a-menu-item 组件 -->
         <a-menu-item v-else-if="!item.hidden" :key="item">
           <router-link class="link-name" :to="item.path">
-            <component :is="getMeta(item).icon" />
+            <img style="height:18px;width:18px;margin-right: 10px;" :src="item.meta.icon" alt="">
             <span>{{ getMeta(item).title }}</span>
           </router-link>
         </a-menu-item>

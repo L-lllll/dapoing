@@ -4,7 +4,7 @@ export default {
   path: '/system',
   component: Layout,
   redirect: '/system/staffpage',
-  meta: { title: '系统管理'},
+  meta: { title: '系统管理',icon:'https://yjy-teach-oss.oss-cn-beijing.aliyuncs.com/smartPark/menu/image/system.png'},
   children: [
     // 区域管理
     {
