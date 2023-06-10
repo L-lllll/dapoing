@@ -1,21 +1,41 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Layout from '@/views/layout/index.vue'
+import Layout from '@/layout/index.vue'
+import carRouter from './modules/car.js'
+import parkRouter from './modules/park.js'
+import propertyRouter from './modules/property.js'
+import warningRouter from './modules/oneSwing.js'
+import systemRouter from './modules/system.js'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: '/',
-      name: 'dashboard',
-      component: Layout
-    },
-    {
       path: '/login',
       name: 'login',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import('@/views/login/index.vue')
-    }
+      component: () => import('@/views/login/index.vue'),
+      hidden: true
+    },
+    {
+      path: '/',
+      redirect: '/dashboard',
+      component: Layout,
+      // 子节点
+      children: [
+        {
+          path: 'dashboard', // 二级路由的地址
+          component: () => import('@/views/dashboard/index.vue'),
+          // 路由元信息
+          meta: {
+            title: '工作台',
+            icon: 'HomeOutlined'
+          }
+        }
+      ]
+    },
+    parkRouter,
+    carRouter,
+    propertyRouter,
+    warningRouter,
+    systemRouter
   ]
 })
 

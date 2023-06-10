@@ -21,4 +21,16 @@ export default defineConfig({
       }
     }
   },
+  // 生产环境下
+  server: {
+    proxy: {
+      '/api': {
+        target: 'https://api-hmzs.itheima.net/',
+        changeOrigin: true,
+        pathRewrite: {
+          '^/api': ''
+        }
+      }
+    }
+  }
 })

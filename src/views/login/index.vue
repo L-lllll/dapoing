@@ -1,21 +1,33 @@
 <script setup>
 import {ref} from 'vue'
+import { useRouter } from 'vue-router'; 
+import {login} from '../../api/login.js'
+import useToken from '../../stores/token.js'
+const router = useRouter() 
 // 获取表单
 const formDom = ref(null)
 // 登录表单数据
 const loginForm = ref({
   username:'',
   password:'',
-  isAgree:true
 })
+// 是否保存账号密码
+const isAgree = true
 // 校验规则
 const loginRules = ({
     username:[{required:true,message:'用户名不能为空',trigger:'blur'}],
     password:[{required:true,message:'密码不能为空',trigger:'blur'}],
 })
 // 点击登录
-const onFinish = () => {
-  formDom.value.resetFields()
+const onFinish = async(values) => {
+  const {updateToken} = useToken()
+  try{
+    await formDom.value.validateFields()
+    const res = await login(values)
+    // 储存token\
+    updateToken(res.token)
+    router.push('/')
+  }catch(err){ /* empty */ }
 }
 </script>
 <template>
@@ -23,16 +35,16 @@ const onFinish = () => {
     <div class="loginBg"></div>
     <div class="loginForm">
       <h3 class="loginTitle">智慧园区-登录</h3>
-      <a-card class="login-card" ref="formDom">
-         <a-form layout="vertical" :model="loginForm" :rules="loginRules" @finish="onFinish">
+      <a-card class="login-card">
+         <a-form ref="formDom" layout="vertical" :model="loginForm" :rules="loginRules" @finish="onFinish" >
           <a-form-item label="账号" :label-col="{ span: 4 }" :wrapper-col="{ span: 24 }" name="username">
             <a-input style="width: 100%;" v-model:value="loginForm.username"></a-input>
           </a-form-item>
           <a-form-item label="密码" :label-col="{ span: 4 }" :wrapper-col="{ span: 24 }" name="password">
             <a-input-password style="width: 100%;" v-model:value="loginForm.password"></a-input-password>
           </a-form-item>
-          <a-form-item name="isAgree">
-            <a-checkbox v-model:checked="loginForm.isAgree">记住我</a-checkbox>
+          <a-form-item>
+            <a-checkbox v-model:checked="isAgree">记住我</a-checkbox>
           </a-form-item>
           <a-form-item>
             <a-button type="primary" style="width: 100%;border-radius: 4px;" html-type="submit">登录</a-button>
