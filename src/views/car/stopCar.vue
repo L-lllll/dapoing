@@ -55,13 +55,14 @@ onMounted(() => {
         <label>缴纳状态：</label>
         <a-select
           v-model:value="value2"
-          :options="options"
-          mode="multiple"
           :size="size"
           placeholder="未选择"
           style="width: 220px"
-          @popupScroll="popupScroll"
-        ></a-select>
+        >
+        <a-select-option value="">全部</a-select-option>
+        <a-select-option value="0">未缴纳</a-select-option>
+        <a-select-option value="1">已缴纳</a-select-option>
+      </a-select>
       </div>
       <!-- 查询按钮 -->
       <a-button type="primary">查询</a-button>
