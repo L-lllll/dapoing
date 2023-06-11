@@ -16,4 +16,9 @@ const locale = ref(zhCN)
   width: 100%;
   min-height: 100vh;
 }
+/* 隐藏滚动条 */
+::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
 </style>
