@@ -32,7 +32,7 @@ const collapsed = ref(false)
     min-width: 260px !important;
     background-color: #fff !important;
     overflow: auto;
-    height: 100vh;
+    min-height: 100vh;
     .logo {
       height: 60px;
       width: 260px;
@@ -78,5 +78,6 @@ const collapsed = ref(false)
 .ant-layout-content{
   margin: 0 20px;
   background: #ffffff;
+  overflow: auto;
 }
 </style>
