@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue'
-import sideBar from './components/sideBar.vue';
+import sideBar from './components/SideBar.vue';
 import NavBar from './components/NavBar.vue';
 const collapsed = ref(false)
 </script>
@@ -26,13 +26,14 @@ const collapsed = ref(false)
 .app-layout {
   min-height: 100vh;
   display: flex;
-  ::v-deep .ant-layout-sider {
+  :deep(.ant-layout-sider) {
     flex: 0 0 260px !important;
     width: 260px !important;
     min-width: 260px !important;
     background-color: #fff !important;
-    overflow: auto;
-    min-height: 100vh;
+    // overflow: auto;
+    position: fixed;
+    height: 100vh;
     .logo {
       height: 60px;
       width: 260px;
@@ -41,6 +42,7 @@ const collapsed = ref(false)
   .right-layout {
     flex: 1;
     height: 100vh;
+    margin-left: 260px;
     overflow-y: auto;
   }
   .ant-layout-header {
