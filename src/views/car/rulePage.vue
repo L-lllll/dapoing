@@ -1,32 +1,40 @@
 <script setup>
 import {onMounted, ref} from 'vue'
 // import  { SelectProps } from 'ant-design-vue';
-import {getParkManagementList} from '../../api/stop.js'
+import {getRuleList} from '../../api/stop.js'
 //列表title
 const columns = [
-  { title: '序号', dataIndex: 'id', key: 'id' },
-  { title: '车牌号码', dataIndex: 'carNumber', key: 'carNumber' },
-  { title: '收费类型', dataIndex: 'chargeType', key: 'chargeType' },
-  { title: '停车总时长', dataIndex: 'parkingTime', key: 'parkingTime' },
-  { title: '缴纳费用（元）', dataIndex: 'actualCharge', key: 'actualCharge' },
-  { title: '缴纳状态', dataIndex: 'paymentStatus', key: 'paymentStatus' },
-  { title: '缴纳方式', dataIndex: 'paymentMethod', key: 'paymentMethod' },
-  { title: '缴纳时间', dataIndex: 'paymentTime', key: 'paymentTime' }
+  { title: '序号', key: 'number' },
+  { title: '计费规则编号', dataIndex: 'ruleNumber', key: 'ruleNumber' },
+  { title: '计费规则名称', dataIndex: 'ruleName', key: 'ruleName' },
+  { title: '免费时长（分钟）', dataIndex: 'freeDuration', key: 'freeDuration' },
+  { title: '收费上限（元）', dataIndex: 'chargeCeiling', key: 'chargeCeiling' },
+  { title: '计费方式', dataIndex: 'chargeType', key: 'chargeType' },
+  { title: '计费规则', dataIndex: 'ruleNameView', key: 'ruleNameView' },
+  { title: '操作', dataIndex: 'operate' }
 ]
 
-const data = ref([])
 
-onMounted(()=> {
-  //页面加载获取数据
-  getParkManagementListApi()
+//总计
+const total = ref('')
+const list = ref({
+  page: 1,
+  pageSize: 10
 })
-
-const getParkManagementListApi = async()=>{
-  const res = await getParkManagementList()
-  console.log(res)
-  
+//渲染数据列表
+const data = ref(null)
+const getRuleListApi = async()=>{
+  const res = await getRuleList(list.value)
+  total.value = res.total
   data.value = res.rows
 }
+
+  //页面加载获取数据
+onMounted(()=> {
+  getRuleListApi()
+})
+
+
 </script>
 <template>
   <div class="search_table">
@@ -37,7 +45,20 @@ const getParkManagementListApi = async()=>{
     </div>
     <!-- 列表内容 -->
     <div class="search-table__main">
-      <a-table bordered:false :dataSource="data" :columns="columns" />
+      <a-table bordered:false :dataSource="data" :columns="columns">
+        <template #bodyCell="{ column,index }">
+          <template v-if="column.dataIndex === 'operate'">
+           <a-button type="link" style="padding: 4px 15px 4px 0;">编辑</a-button>
+           <a-button type="link" style="padding: 4px 15px 4px 0;">删除</a-button>
+          </template>
+          <template v-if="column.key === 'number'">
+            <span>{{ (list.page - 1) * list.pageSize +index +1}}</span>
+          </template>
+          <template v-if="column.dataIndex === 'chargeType'">
+            {{ data.chargeType === 'duration' ? '时长收费' : data.chargeType === 'turn' ? '按次收费' : '分段收费' }}
+          </template>
+        </template>
+      </a-table>
     </div>
   </div>
 </template>

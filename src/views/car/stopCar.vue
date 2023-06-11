@@ -1,10 +1,10 @@
 <script setup>
-import {onMounted, ref} from 'vue'
+import { onMounted, ref } from 'vue'
 // import  { SelectProps } from 'ant-design-vue';
-import {getParkManagementList} from '../../api/stop.js'
+import { getParkManagementList } from '../../api/stop.js'
 //列表title
 const columns = [
-  { title: '序号', dataIndex: 'id', key: 'id' },
+  { title: '序号', key: 'number' },
   { title: '车牌号码', dataIndex: 'carNumber', key: 'carNumber' },
   { title: '收费类型', dataIndex: 'chargeType', key: 'chargeType' },
   { title: '停车总时长', dataIndex: 'parkingTime', key: 'parkingTime' },
@@ -14,19 +14,23 @@ const columns = [
   { title: '缴纳时间', dataIndex: 'paymentTime', key: 'paymentTime' }
 ]
 
-const data = ref([])
-
-onMounted(()=> {
-  //页面加载获取数据
-  getParkManagementListApi()
+//总计
+const total = ref('')
+const list = ref({
+  page: 1,
+  pageSize: 10
 })
-
-const getParkManagementListApi = async()=>{
-  const res = await getParkManagementList()
-  console.log(res)
-  
+//渲染列表数据
+const data = ref(null)
+const getParkManagementListApi = async () => {
+  const res = await getParkManagementList(list.value)
+  total.value = res.total
   data.value = res.rows
 }
+//页面加载获取数据
+onMounted(() => {
+  getParkManagementListApi()
+})
 </script>
 <template>
   <div class="search_table">
@@ -55,7 +59,13 @@ const getParkManagementListApi = async()=>{
     </div>
     <!-- 列表内容 -->
     <div class="search-table__main">
-      <a-table bordered:false :dataSource="data" :columns="columns" />
+      <a-table bordered:false :dataSource="data" :columns="columns">
+        <template #bodyCell="{ column, index }">
+          <template v-if="column.key === 'number'">
+            <span>{{ (list.page - 1) * list.pageSize + index + 1 }}</span>
+          </template>
+        </template>
+      </a-table>
     </div>
   </div>
 </template>

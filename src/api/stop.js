@@ -13,7 +13,7 @@ export function getParkManagementList(params){
 //1、获取计费规则列表
 export function getRuleList(params){
   return request({
-    url:' /parking/rule/list',
+    url:'/parking/rule/list',
     method:'get',
     params
   })
