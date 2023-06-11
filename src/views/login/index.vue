@@ -3,6 +3,7 @@ import {ref} from 'vue'
 import { useRouter } from 'vue-router'; 
 import {login} from '../../api/login.js'
 import useToken from '../../stores/token.js'
+import {message} from 'ant-design-vue'
 const router = useRouter() 
 // 获取表单
 const formDom = ref(null)
@@ -24,6 +25,7 @@ const onFinish = async(values) => {
   try{
     await formDom.value.validateFields()
     const res = await login(values)
+    message.success('登陆成功')
     // 储存token\
     updateToken(res.token)
     router.push('/')
@@ -37,10 +39,10 @@ const onFinish = async(values) => {
       <h3 class="loginTitle">智慧园区-登录</h3>
       <a-card class="login-card">
          <a-form ref="formDom" layout="vertical" :model="loginForm" :rules="loginRules" @finish="onFinish" >
-          <a-form-item label="账号" :label-col="{ span: 4 }" :wrapper-col="{ span: 24 }" name="username">
+          <a-form-item label="账号" :label-col="{ span: 10 }" :wrapper-col="{ span: 24 }" name="username">
             <a-input style="width: 100%;" v-model:value="loginForm.username"></a-input>
           </a-form-item>
-          <a-form-item label="密码" :label-col="{ span: 4 }" :wrapper-col="{ span: 24 }" name="password">
+          <a-form-item label="密码" :label-col="{ span: 10 }" :wrapper-col="{ span: 24 }" name="password">
             <a-input-password style="width: 100%;" v-model:value="loginForm.password"></a-input-password>
           </a-form-item>
           <a-form-item>
