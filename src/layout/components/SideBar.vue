@@ -7,7 +7,6 @@ const routes = computed(() => {
   // 一级菜单是否有需要隐藏
   return router.options.routes.filter((item) => !item.hidden) // 找出所有的hidden为false的路由
 })
-console.log(routes)
 const getMeta = (obj) => {
   // 判断当前有没有子节点并获取路由传递过来的meta
   if (obj.children && obj.children.length) {
@@ -40,6 +39,7 @@ const getMeta = (obj) => {
             </a-menu-item>
           </template>
         </a-sub-menu>
+
         <!-- 如果当前路由没有子节点，就直接渲染一个 a-menu-item 组件 -->
         <a-menu-item v-else-if="!item.hidden" :key="item">
           <router-link class="link-name" :to="item.path">
