@@ -27,7 +27,20 @@ const getRuleListApi = async()=>{
   const res = await getRuleList(list.value)
   total.value = res.total
   data.value = res.rows
+  console.log(res);
 }
+
+//改变页码
+// const onShowSizeChange = (current, size) => {
+//   page.value = current
+//   pageSize.value = size
+//   getRuleListApi()
+// };
+const onPageChange = (page,pageSize) => {
+  list.value.page = page
+  list.value.pageSize = pageSize
+  getRuleListApi()
+};
 
   //页面加载获取数据
 onMounted(()=> {
@@ -45,8 +58,8 @@ onMounted(()=> {
     </div>
     <!-- 列表内容 -->
     <div class="search-table__main">
-      <a-table bordered:false :dataSource="data" :columns="columns">
-        <template #bodyCell="{ column,index }">
+      <a-table bordered:false :dataSource="data" :pagination="false" :ellipsis="true"  :columns="columns">
+        <template #bodyCell="{ column,text,index }">
           <template v-if="column.dataIndex === 'operate'">
            <a-button type="link" style="padding: 4px 15px 4px 0;">编辑</a-button>
            <a-button type="link" style="padding: 4px 15px 4px 0;">删除</a-button>
@@ -55,10 +68,13 @@ onMounted(()=> {
             <span>{{ (list.page - 1) * list.pageSize +index +1}}</span>
           </template>
           <template v-if="column.dataIndex === 'chargeType'">
-            {{ data.chargeType === 'duration' ? '时长收费' : data.chargeType === 'turn' ? '按次收费' : '分段收费' }}
+            {{ text === 'duration' ? '时长收费' : data.chargeType === 'turn' ? '按次收费' : '分段收费' }}
           </template>
         </template>
       </a-table>
+    </div>
+    <div id="components-pagination-demo-mini">
+      <a-pagination @change="onPageChange" @showSizeChange="onShowSizeChange" size="small" :total="total" show-size-changer show-quick-jumper :show-total="total => `共 ${total} 条`"/>
     </div>
   </div>
 </template>
@@ -90,5 +106,10 @@ onMounted(()=> {
 }
 .ant-btn {
   border-radius: 4px;
+}
+#components-pagination-demo-mini{
+  margin-top: 20px;
+  float: right;
+  padding-bottom: 20px;
 }
 </style>
