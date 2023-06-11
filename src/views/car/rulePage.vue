@@ -1,46 +1,90 @@
 <script setup>
 import {onMounted, ref} from 'vue'
-// import  { SelectProps } from 'ant-design-vue';
-import {getParkManagementList} from '../../api/stop.js'
+import  { Modal, message } from 'ant-design-vue';
+import {getRuleList,DelRule} from '../../api/stop.js'
+import addRules from './component/add-rules.vue'
 //列表title
 const columns = [
-  { title: '序号', dataIndex: 'id', key: 'id' },
-  { title: '车牌号码', dataIndex: 'carNumber', key: 'carNumber' },
-  { title: '收费类型', dataIndex: 'chargeType', key: 'chargeType' },
-  { title: '停车总时长', dataIndex: 'parkingTime', key: 'parkingTime' },
-  { title: '缴纳费用（元）', dataIndex: 'actualCharge', key: 'actualCharge' },
-  { title: '缴纳状态', dataIndex: 'paymentStatus', key: 'paymentStatus' },
-  { title: '缴纳方式', dataIndex: 'paymentMethod', key: 'paymentMethod' },
-  { title: '缴纳时间', dataIndex: 'paymentTime', key: 'paymentTime' }
+  { title: '序号', key: 'number' },
+  { title: '计费规则编号', dataIndex: 'ruleNumber', key: 'ruleNumber' },
+  { title: '计费规则名称', dataIndex: 'ruleName', key: 'ruleName' },
+  { title: '免费时长（分钟）', dataIndex: 'freeDuration', key: 'freeDuration' },
+  { title: '收费上限（元）', dataIndex: 'chargeCeiling', key: 'chargeCeiling' },
+  { title: '计费方式', dataIndex: 'chargeType', key: 'chargeType' },
+  { title: '计费规则', dataIndex: 'ruleNameView', key: 'ruleNameView' },
+  { title: '操作', dataIndex: 'operate' }
 ]
-
-const data = ref([])
-
-onMounted(()=> {
-  //页面加载获取数据
-  getParkManagementListApi()
+//总计
+const total = ref('')
+const list = ref({
+  page: 1,
+  pageSize: 10
 })
-
-const getParkManagementListApi = async()=>{
-  const res = await getParkManagementList()
-  console.log(res)
-  
+//渲染数据列表
+const data = ref(null)
+const getRuleListApi = async()=>{
+  const res = await getRuleList(list.value)
+  total.value = res.total
   data.value = res.rows
+  console.log(res);
 }
+
+const onPageChange = (page,pageSize) => {
+  list.value.page = page
+  list.value.pageSize = pageSize
+  getRuleListApi()
+};
+
+  //页面加载获取数据
+onMounted(()=> {
+  getRuleListApi()
+})
+//删除功能
+const DelRuleApi = (id) =>{
+  Modal.confirm({
+    content:'是否确认删除当前计费规则？',
+    async onOk(){
+      await DelRule(id)
+      message.success('删除计费规则成功')
+      getRuleListApi()
+    }
+  })
+}
+//弹层状态
+let showDialog = ref(false)
+
 </script>
 <template>
   <div class="search_table">
     <!-- 头部搜索框 -->
     <div class="search-table__header">
       <!-- 查询按钮 -->
-      <a-button type="primary">增加停车计费规则</a-button>
+      <a-button type="primary" @click="showDialog = true">增加停车计费规则</a-button>
+      <!-- 增加停车计费规则弹层 -->
     </div>
     <!-- 列表内容 -->
     <div class="search-table__main">
-      <a-table bordered:false :dataSource="data" :columns="columns" />
+      <a-table bordered:false :dataSource="data" :pagination="false" :ellipsis="true"  :columns="columns">
+        <template #bodyCell="{ column,text,index,record }">
+          <template v-if="column.dataIndex === 'operate'">
+           <a-button type="link" style="padding: 4px 15px 4px 0;">编辑</a-button>
+           <a-button type="link" style="padding: 4px 15px 4px 0;" @click="DelRuleApi(record.id)">删除</a-button>
+          </template>
+          <template v-if="column.key === 'number'">
+            <span>{{ (list.page - 1) * list.pageSize +index +1}}</span>
+          </template>
+          <template v-if="column.dataIndex === 'chargeType'">
+            {{ text === 'duration' ? '时长收费' : text === 'turn' ? '按次收费' : '分段收费' }}
+          </template>
+        </template>
+      </a-table>
     </div>
-  </div>
-</template>
+    <div id="components-pagination-demo-mini">
+      <a-pagination @change="onPageChange" @showSizeChange="onShowSizeChange" size="small" :total="total" show-size-changer show-quick-jumper :show-total="total => `共 ${total} 条`"/>
+      </div>
+    </div>
+    <add-rules v-model:showDialog="showDialog"></add-rules>
+  </template>
 <style scoped>
 .search_table {
   padding: 20px 20px 0;
@@ -69,5 +113,10 @@ const getParkManagementListApi = async()=>{
 }
 .ant-btn {
   border-radius: 4px;
+}
+#components-pagination-demo-mini{
+  margin-top: 20px;
+  float: right;
+  padding-bottom: 20px;
 }
 </style>

@@ -131,7 +131,6 @@ const onPageChange = (val) => {
 };
 const data = ref([])
 onMounted(() => {
-
   getAreaListAPI()
 })
 </script>

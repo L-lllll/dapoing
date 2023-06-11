@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue'
-import sideBar from './components/SideBar.vue';
+import sideBar from './components/sideBar.vue';
 import NavBar from './components/NavBar.vue';
 const collapsed = ref(false)
 </script>
