@@ -1,7 +1,8 @@
 <script setup>
 import {onMounted, ref} from 'vue'
-// import  { SelectProps } from 'ant-design-vue';
-import {getRuleList} from '../../api/stop.js'
+import  { Modal, message } from 'ant-design-vue';
+import {getRuleList,DelRule} from '../../api/stop.js'
+import addRules from './component/add-rules.vue'
 //列表title
 const columns = [
   { title: '序号', key: 'number' },
@@ -13,8 +14,6 @@ const columns = [
   { title: '计费规则', dataIndex: 'ruleNameView', key: 'ruleNameView' },
   { title: '操作', dataIndex: 'operate' }
 ]
-
-
 //总计
 const total = ref('')
 const list = ref({
@@ -30,12 +29,6 @@ const getRuleListApi = async()=>{
   console.log(res);
 }
 
-//改变页码
-// const onShowSizeChange = (current, size) => {
-//   page.value = current
-//   pageSize.value = size
-//   getRuleListApi()
-// };
 const onPageChange = (page,pageSize) => {
   list.value.page = page
   list.value.pageSize = pageSize
@@ -46,7 +39,19 @@ const onPageChange = (page,pageSize) => {
 onMounted(()=> {
   getRuleListApi()
 })
-
+//删除功能
+const DelRuleApi = (id) =>{
+  Modal.confirm({
+    content:'是否确认删除当前计费规则？',
+    async onOk(){
+      await DelRule(id)
+      message.success('删除计费规则成功')
+      getRuleListApi()
+    }
+  })
+}
+//弹层状态
+let showDialog = ref(false)
 
 </script>
 <template>
@@ -54,30 +59,32 @@ onMounted(()=> {
     <!-- 头部搜索框 -->
     <div class="search-table__header">
       <!-- 查询按钮 -->
-      <a-button type="primary">增加停车计费规则</a-button>
+      <a-button type="primary" @click="showDialog = true">增加停车计费规则</a-button>
+      <!-- 增加停车计费规则弹层 -->
     </div>
     <!-- 列表内容 -->
     <div class="search-table__main">
       <a-table bordered:false :dataSource="data" :pagination="false" :ellipsis="true"  :columns="columns">
-        <template #bodyCell="{ column,text,index }">
+        <template #bodyCell="{ column,text,index,record }">
           <template v-if="column.dataIndex === 'operate'">
            <a-button type="link" style="padding: 4px 15px 4px 0;">编辑</a-button>
-           <a-button type="link" style="padding: 4px 15px 4px 0;">删除</a-button>
+           <a-button type="link" style="padding: 4px 15px 4px 0;" @click="DelRuleApi(record.id)">删除</a-button>
           </template>
           <template v-if="column.key === 'number'">
             <span>{{ (list.page - 1) * list.pageSize +index +1}}</span>
           </template>
           <template v-if="column.dataIndex === 'chargeType'">
-            {{ text === 'duration' ? '时长收费' : data.chargeType === 'turn' ? '按次收费' : '分段收费' }}
+            {{ text === 'duration' ? '时长收费' : text === 'turn' ? '按次收费' : '分段收费' }}
           </template>
         </template>
       </a-table>
     </div>
     <div id="components-pagination-demo-mini">
       <a-pagination @change="onPageChange" @showSizeChange="onShowSizeChange" size="small" :total="total" show-size-changer show-quick-jumper :show-total="total => `共 ${total} 条`"/>
+      </div>
     </div>
-  </div>
-</template>
+    <add-rules v-model:showDialog="showDialog"></add-rules>
+  </template>
 <style scoped>
 .search_table {
   padding: 20px 20px 0;

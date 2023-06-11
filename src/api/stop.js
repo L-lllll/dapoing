@@ -38,7 +38,7 @@ export function AddRule(data){
 export function DelRule(id){
   return request({
     url:`/parking/rule/${id}`,
-    method:'delete',
+    method:'delete'
   })
 }
 //编辑计费规则
