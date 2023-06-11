@@ -27,12 +27,12 @@ export function addBuilding(data) {
 //楼宇详情查询
 export function getBuildingDetails(id) {
   return request({
-  url: `v1/park/building/${id}/`
+  url: `/park/building/${id}/`
   })
 }
 //查询可租赁楼宇
 export function getBuildinglist() {
   return request({
-  url: ' v1/park/rent/building/'
+  url: ' /park/rent/building/'
   })
 }
