@@ -1,6 +1,14 @@
+<script setup>
+// 设置中文ant组件
+import {ref} from 'vue'
+import zhCN from 'ant-design-vue/es/locale/zh_CN';
+const locale = ref(zhCN)
+</script>
 <template>
   <div class="app">
-    <router-view></router-view>
+    <a-config-provider :locale="locale">
+      <router-view></router-view>
+    </a-config-provider>
   </div>
 </template>
 <style>
