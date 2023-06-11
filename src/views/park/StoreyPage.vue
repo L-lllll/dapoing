@@ -1,6 +1,7 @@
 <script setup>
 import {ref,onMounted } from 'vue'
 import { getBuilding } from '@/api/building'
+import addBuliding from './commpent/add-buliding.vue'
 
 const list = ref([])
 const columns = [
@@ -20,7 +21,7 @@ const getBuildingAPI = async () => {
   list.value = res.rows
 
 }
-
+const showDialog = ref(false)
 onMounted(() => {
   getBuildingAPI()
 })
@@ -35,12 +36,14 @@ onMounted(() => {
       </a-space>
    
     </div>
-    <a-button type="primary">添加楼宇</a-button>
+    <a-button type="primary" @click="showDialog = true">添加楼宇</a-button>
+    <add-buliding :showDialog="showDialog"></add-buliding>
     <a-table :dataSource="list" :columns="columns" />
     <div class="my-pagination-wrapper">
     <a-pagination :show-total="total => `共 ${total} 条`" v-model:current="current1" show-quick-jumper :total="500" @change="onChange" />
   </div>
   </div>
+  <add-buliding v-model:showDialog="showDialog" @addSuccess="getBuildingAPI"></add-buliding>
 </template>
 
 <style scoped>
@@ -57,5 +60,6 @@ onMounted(() => {
   float: right;
   margin: 0;
   padding: 0;
+  
 }
 </style>
