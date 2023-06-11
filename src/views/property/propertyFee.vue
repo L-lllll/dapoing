@@ -7,7 +7,8 @@ const searchForm = computed(() => {
     page: 1,
     pageSize: 10,
     start: format.value[0],
-    end: format.value[1]
+    end: format.value[1],
+    enterpriseName:''
   }
 })
 const onFinish = () => {
@@ -74,7 +75,6 @@ const onChange = (pageSize,page) => {
   searchForm.value.pageSize = page
   getTableListAPI()
 }
-const res = ref('')
 </script>
 <template>
   <div class="search" :model="searchForm" @finish="onFinish">
@@ -83,21 +83,21 @@ const res = ref('')
         <a-space :size="16">
           <a-form-item label="企业名称">
             <a-input
-              v-model.value="searchForm.enterpriseName"
+              v-model:value="searchForm.enterpriseName"
               placeholder="请输入企业名称"
               style="width: 220px"
             ></a-input>
           </a-form-item>
           <a-form-item label="缴费时间">
             <a-range-picker
-              v-model:value="format"
+              v-model="format"
               format="YYYY-MM-DD"
               valueFormat="YYYY-MM-DD"
               style="width: 260px"
             />
           </a-form-item>
           <a-form-item>
-            <a-button type="primary">查询</a-button>
+            <a-button type="primary" @click="getTableListAPI">查询</a-button>
           </a-form-item>
         </a-space>
       </a-row>
@@ -108,6 +108,15 @@ const res = ref('')
     <a-table :dataSource="tableList" :columns="columns" :pagination="false" :scroll="{ x: 1200 }">
       <template #headerCell="{ title, column }">
         <span v-if="column.key === 'propertyFeePrice'">{{ title }} <sub>2</sub>)</span>
+      </template>
+      <template #bodyCell="{ column, record }">
+        <template v-if="column.dataIndex === 'index'" >
+          <span>{{ tableList.indexOf(record) + 1 }}</span>
+        </template>
+        <template v-if="column.dataIndex === 'operation'">
+          <a-button type="text" style="color:#4770ff">查看</a-button>
+          <a-button type="text" style="color:#4770ff">删除</a-button>
+        </template>
       </template>
     </a-table>
   </div>
@@ -145,6 +154,8 @@ input,
   sub {
     top: -0.3em;
     left: -0.2em;
+    font-size: 12px;
+    transform: scale(0.8);
   }
   .ant-table-thead
     > tr
@@ -156,9 +167,38 @@ input,
   table {
     border-collapse: collapse;
     overflow: hidden;
+    .ant-btn {
+      padding-left: 0;
+      font-size: 14px;
+    }
   }
+}
+.ant-table-container table > thead > tr:first-child th:last-child {
+  width: 15%;
+}
+.ant-table-container table > thead > tr:first-child th:first-child {
+  width: 6.5%;
+}
+.ant-table-container table > thead > tr:first-child th:nth-child(3) {
+  width: 15.5%;
+}
+.ant-table-container table > thead > tr:first-child th:nth-child(2) {
+  width: 14.6%;
+}
+.ant-table-container table > thead > tr:first-child th:nth-child(4) {
+  width: 13%;
+}
+.ant-table-container table > thead > tr:first-child th:nth-child(5) {
+  width: 9.5%;
 }
 .pagination {
   float: right;
+}
+.ant-table-thead > tr > th, .ant-table-tbody > tr > td, .ant-table tfoot > tr > th, .ant-table tfoot > tr > td {
+  padding: 8px;
+}
+.ant-table-thead > tr > th {
+  height: 48px;
+  background: #f4f6f8;
 }
 </style>
