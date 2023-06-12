@@ -26,3 +26,11 @@ export const getBulidingList = () => {
     url:'park/rent/building'
   })
 }
+// 上传文件
+export const updateFile = data => {
+  return request({
+    url:'/upload',
+    method:'post',
+    data
+  })
+}
