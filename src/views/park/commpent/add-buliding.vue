@@ -1,6 +1,6 @@
 <script setup>
-import { addBuilding } from '@/api/building'
-import { reactive, ref } from 'vue'
+import { addBuilding, getBuildingDetails, updateBuilding } from '@/api/building'
+import { ref, computed } from 'vue'
 import { message } from 'ant-design-vue'
 
 const props = defineProps({
@@ -9,8 +9,14 @@ const props = defineProps({
     default: false
   }
 })
+const getBuildingDetailsAPI = async (id) => {
+  formData.value = await getBuildingDetails(id)
+}
+defineExpose({
+  getBuildingDetailsAPI
+})
 const formRef = ref(null)
-const formData = reactive({
+const formData = ref({
   name: '',
   floors: 0,
   area: 0,
@@ -24,19 +30,33 @@ const rules = {
 }
 const emit = defineEmits(['update:showDialog', 'addSuccess'])
 const close = () => {
+  formData.value = {
+    name: '',
+    floors: 0,
+    area: 0,
+    propertyFeePrice: 0
+  }
   formRef.value.resetFields() //重置表单
   emit('update:showDialog', false)
 }
 const onFinisheed = async (values) => {
-  await addBuilding(values)
-  message.success('新增成功')
+  if (formData.value.id) {
+    await updateBuilding(formData.value.id)
+    message.success('编辑成功')
+  } else {
+    await addBuilding(values)
+    message.success('新增成功')
+  }
+
   close()
   emit('addSuccess')
-  ;(formData.name = ''), (formData.floors = 0), (formData.area = 0), (formData.propertyFeePrice = 0)
 }
+const showTitle = computed(() => {
+  return formData.value.id ? '编辑楼宇' : '新增楼宇'
+})
 </script>
 <template>
-  <a-modal :footer="null" :visible="props.showDialog" @cancel="close" title="添加楼宇">
+  <a-modal :footer="null" :visible="props.showDialog" @cancel="close" :title="showTitle">
     <a-form
       ref="formRef"
       :rules="rules"
@@ -57,7 +77,7 @@ const onFinisheed = async (values) => {
         <a-input v-model="formData.propertyFeePrice" placeholder="请输入物业费"></a-input>
       </a-form-item>
       <a-form-item>
-        <div :style="{ background: 'rgb(244, 246, 248)', padding: '10px 16px' }">
+        <div class="ant-modal-footer">
           <a-row type="flex" justify="center">
             <a-space>
               <a-button style="border-radius: 10px" @click="close">取消</a-button>
@@ -73,5 +93,8 @@ const onFinisheed = async (values) => {
 </template>
 
 <style scoped>
-
+.ant-modal-footer {
+  background-color: rgb(244, 246, 248);
+  padding: 10px 16px;
+}
 </style>
