@@ -44,7 +44,7 @@ export function DelRule(id){
 //编辑计费规则
 export function updateRule(data){
   return request({
-    url:`/parking/rule/${data.id}`,
+    url:`/parking/rule`,
     method:'put',
     data
   })
