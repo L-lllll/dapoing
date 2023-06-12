@@ -18,6 +18,7 @@ const columns = [
 const data = ref({
   page: 1,
   pageSize: 10,
+  total: 0,
   name: ''
 })
 //渲染列表
@@ -25,6 +26,14 @@ const getBuildingAPI = async () => {
   const res = await getBuilding(data.value)
   console.log(res)
   list.value = res.rows
+  total.value = res.total
+}
+//分页
+const total = ref(0)
+const onShowSizeChange = (page, pageSize) => {
+  list.value = page
+  list.value = pageSize
+  getBuildingAPI()
 }
 const showDialog = ref(false)
 //页面加载获取数据
@@ -37,17 +46,8 @@ const editRow = (id) => {
   showDialog.value = true
   addBuildingRef.value.getBuildingDetailsAPI(id)
 }
-//分页
-const total = ref('')
-const onPageChange = (page, pageSize) => {
-  list.value.page = page
-  list.value.pageSize = pageSize
-  getBuildingAPI()
-}
+
 //删除
-const disabled = (status) => {
-  return status !== '1'
-}
 const delBuildingAPI = (id) => {
   Modal.confirm({
     title: '提示',
@@ -79,17 +79,17 @@ const delBuildingAPI = (id) => {
       <a-button type="primary" @click="showDialog = true">添加楼宇</a-button>
       <add-buliding :showDialog="showDialog"></add-buliding>
       <a-table :dataSource="list" :columns="columns" :pagination="false">
-        <template #bodyCell="{ index, text, column, record }">
+        <template #bodyCell="{ index, column, record }">
           <a-space v-if="column.dataIndex === 'demoFlag'">
-            <a-button type="link" style="padding: 4px 15px 4px 0" @click="editRow(index.id)">编辑</a-button>
+            <a-button type="link" style="padding: 4px 15px 4px 0" @click="editRow(record.id)">编辑</a-button>
               <!-- 删除禁用  disabled  租赁中删除禁用-->
-            <a-button v-if="disabled" type="link" style="padding: 4px 15px 4px 0" @click="delBuildingAPI(record.id)">删除</a-button>
+            <a-button :disabled="record.status === 1 ? true : false" type="link" style="padding: 4px 15px 4px 0" @click="delBuildingAPI(record.id)">删除</a-button>
           </a-space>
           <template v-if="column.key === 'number'">
             <span>{{ (data.page - 1) * data.pageSize + index + 1 }}</span>
           </template>
           <template v-if="column.dataIndex === 'status'">
-            <span>{{ text === '0' ? '空置中' : '租赁中' }}</span>
+            <span>{{ record.status === 0 ? '空置中' : '租赁中' }}</span>
           </template>
         </template>
       </a-table>

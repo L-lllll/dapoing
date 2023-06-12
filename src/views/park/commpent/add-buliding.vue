@@ -62,16 +62,17 @@ const showTitle = computed(() => {
 })
 </script>
 <template>
-  <a-modal :footer="null" :visible="props.showDialog" @cancel="close" :title="showTitle">
+ <div>
+   <a-modal :footer="null" :visible="props.showDialog" @cancel="close" :title="showTitle" >
     <a-form
       ref="formRef"
       :rules="rules"
       @finish="onFinisheed"
       :model="formData"
       :wrapper-col="wrapperCol"
-      :label-col="{ span: 4 }"
+      :label-col="{ span: 4}"
     >
-      <a-form-item name="name" label="楼宇名称">
+      <a-form-item name="name" label="楼宇名称" >
         <a-input v-model:value="formData.name" placeholder="请输入楼宇名称"></a-input>
       </a-form-item>
       <a-form-item name="floors" label="楼宇层数">
@@ -85,7 +86,7 @@ const showTitle = computed(() => {
       </a-form-item>
       <a-form-item>
         <div class="ant-modal-footer">
-          <a-row type="flex" justify="center">
+          <a-row type="flex">
             <a-space>
               <a-button style="border-radius: 10px" @click="close">取消</a-button>
               <a-button style="border-radius: 10px" type="primary" html-type="submit">确定</a-button >
@@ -95,6 +96,7 @@ const showTitle = computed(() => {
       </a-form-item>
     </a-form>
   </a-modal>
+ </div>
 </template>
 
 <style scoped>

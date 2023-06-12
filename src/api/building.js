@@ -1,10 +1,11 @@
 import request from '@/untils/request'
 //楼宇管理
 //楼宇修改
-export function updateBuilding(id) {
+export function updateBuilding(data) {
   return request({
-  url: `/park/building/${id}`,
+  url: `/park/building/`,
   method: 'put',
+  data
   })
 }
 //楼宇查询
