@@ -119,7 +119,7 @@ const page = ref(1)
 const pageSize = ref(10)
 const getAreaListAPI = async() => {
   const res = await getAreaList({page: page.value,pageSize: pageSize.value})
-  console.log(res)
+  // console.log(res)
   data.value = res.rows
   total.value = res.total
 }
@@ -136,7 +136,7 @@ const onPageChange = (val) => {
 const getSeleList = async() => {
   const res = await getSelectList()
   selectList.value = res
-  console.log(selectList.value)
+  // console.log(selectList.value)
 }
 const delAreaListAPI = (id) => {
 // console.log(id)

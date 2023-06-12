@@ -15,6 +15,12 @@ const router = createRouter({
       hidden: true
     },
     {
+      path: '/addmouth',
+      name: 'addmouth',
+      component: () => import('@/views/car/component/addMouth.vue'),
+      hidden: true
+    },
+    {
       path: '/',
       redirect: '/dashboard',
       component: Layout,
