@@ -11,7 +11,6 @@ const props = defineProps({
     },
     currdId:{
         type:Number,
-        // eslint-disable-next-line vue/require-valid-default-prop
         default:null
     }
 })
@@ -58,6 +57,7 @@ formData.value.phonenumber=''
 
 
 }
+const title=ref([''])
 const formData=ref({
     name:'',//姓名
     userName:'',//账号
@@ -74,11 +74,14 @@ const createCreative=ref(null)
       <a-modal 
       @cancel="close"
       :visible="props.Staff" 
-      title="添加员工" 
+      :title="title" 
       :footer="null"
         style="width: 38%;"
         :getContainer="()=>createCreative"
         >
+        <template>
+            <span :v-if="currdId">{{title='编辑员工'}}</span>
+        </template>
 <a-form :model="formData"  @finish="onFinished" ref="formInfo" :label-col="{ span: 8}" layout="vertical" style="padding: 20px 80px 0px;">
     <a-form-item name="name"  label="员工姓名" 
      :rules="[{ required: true, message: '员工姓名不能为空', trigger: 'blur' }]">

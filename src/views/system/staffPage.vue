@@ -63,10 +63,11 @@ const IncreaseStaff=()=>{
   Staff.value=true
 }
 //编辑
-const userId=ref({})
+const userId=ref(null)
 const adit=(record)=>{
   IncreaseStaff()
-  userId.value=record
+  userId.value=record.id
+  // console.log( userId.value)
 }
 </script>
 <template>
@@ -99,7 +100,7 @@ const adit=(record)=>{
 {{record.status?'启用':'未启用'  }}
     </template>
     <template v-if="column.dataIndex === 'createTime'">
-{{record.createTime  }}
+{{record.createTime}}
     </template>
       <div v-if="column.dataIndex === 'adit'" class="operate">
          <a-button type="text" style="color: #7094ff;" @click="adit(record)">编辑</a-button>
