@@ -236,7 +236,7 @@ onMounted(() => {
         <a-form-item label="关联计费规则" name="ruleId" :rules="[{ required: true, message: '计费规则不能为空', trigger: 'blur' }]">
           <a-select
           placeholder="请选择"
-          v-model:value="ruleList.ruleId"
+          v-model:value="ruleList.ruleId" 
           :options="selectList"
           :field-names="{label: 'ruleName', value: 'ruleId'}"
           >
