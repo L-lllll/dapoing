@@ -1,30 +1,41 @@
 <script setup>
 import {message} from 'ant-design-vue'
 import { ref,onMounted,computed,watchEffect } from 'vue';
-import {getEntrepreneur, getBuilding, getPayment,addBill} from '@/api/propertyFee'
+import {getEntrepreneur, getBuilding, getPayment,addBill,getTableList} from '@/api/propertyFee'
 // 新增
 const props = defineProps({
   visible: {
     type: Boolean,
     default: false
+  },
+  modelId: {
+    type: Number,
+    default: 0
   }
 })
 const addFormRef = ref(null)
 // 关闭弹窗
 const emit = defineEmits(['update:visible', 'addSuccess'])
 const close = () => {
+  if (!props.modelId) {
     addFormRef.value.resetFields()
     addForm.value = {
       buildingId:null,
       time:[null,null],
+    }
   }
+
   emit('update:visible', false)
 }
 // entrepreneurList 获取租户下拉列表
 const entrepreneurList = ref([])
 onMounted(() =>{
-  getEntrepreneurAPI()
-  getBuildingAPI()
+  if (props.modelId) {
+    getbuil()
+  } else {
+    getEntrepreneurAPI()
+    getBuildingAPI()
+  }
 })
 const getEntrepreneurAPI = async () => {
   entrepreneurList.value = await getEntrepreneur()
@@ -78,14 +89,25 @@ watchEffect(() => {
 })
   // 提交表单
 const onFinish = async () => {
-  console.log(123)
-  await addFormRef.value.validateFields()
-  await addBill(addFormData.value)
-  emit('addSuccess')
-  message.success('添加成功')
+  if (!props.modelId) {
+    await addFormRef.value.validateFields()
+    await addBill(addFormData.value)
+    emit('addSuccess')
+    message.success('添加成功')
+  }
   close()
 }
 
+// 查看表单
+const modalTitle = ref('添加账单')
+if (props.modelId) {
+  modalTitle.value = '查看账单'
+}
+// 获取账单详情
+const buil = ref({})
+const getbuil = async () => {
+  buil.value =  await getTableList(props.modelId)
+}
 </script>
 
 <template>
@@ -94,11 +116,11 @@ const onFinish = async () => {
     keyboard
     maskClosable
     @cancel="close"
-    title="添加表单"
+    :title="modalTitle"
     :footer="null"
     width="580px"
   >
-    <a-form :model="addForm" @finish="onFinish" ref="addFormRef" :rules="addFormRules">
+    <a-form :model="addForm" @finish="onFinish" ref="addFormRef" :rules="addFormRules" v-if="!props.modelId">
       <a-row>
         <a-form-item label="选择租户" name="enterpriseId">
           <a-select
@@ -146,6 +168,15 @@ const onFinish = async () => {
         </a-form-item>
       </a-row>
     </a-form>
+    <ul class="lookBuil" v-else>
+      <li><span>租户名称:</span><p>{{ buil.enterpriseName }}</p></li>
+      <li><span>租赁楼宇:</span><p>{{ buil.buildingId }}</p></li>
+      <li><span>缴费周期:</span><p>{{ buil.startTime }}至{{ buil.endTime }}</p></li>
+      <li><span>物业费(元/m<sub>2</sub>):</span><p>{{ buil.propertyFeePrice }}</p></li>
+      <li><span>账单金额(元):</span><p>{{ buil.paymentAmount }}</p></li>
+      <li><span>支付方式:</span><p>{{ buil.paymentMethodValue }}</p></li>
+      <li><span>缴费时间:</span><p>{{ buil.createTime }}</p></li>
+    </ul>
     <a-row class="footerBtn" type="flex" justify="end">
       <a-button type="text" @click="close">取消</a-button>
       <a-button type="primary" style="border-radius: 8px;" html-type="submit" @click="onFinish">确定</a-button>
@@ -180,6 +211,33 @@ const onFinish = async () => {
     margin-bottom: 24px;
   }
   .ant-form-horizontal .ant-form-item-label {
+    text-align: left;
+  }
+}
+
+.lookBuil {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  text-align: center;
+
+  li {
+    width: 92%;
+    display: flex;
+    justify-content: left;
+    margin-bottom: 10px;
+  }
+
+  span {
+    display: inline-block;
+    width: 35%;
+    margin-right: 5%;
+    text-align: right;
+    color: #909399;
+  }
+  p {
+    width: 60%;
     text-align: left;
   }
 }
