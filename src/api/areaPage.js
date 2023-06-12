@@ -9,8 +9,27 @@ export const getAreaList = params => {
 //添加区域
 export const addAreaList = data => {
     return request({
-      url:'/parking/area/list',
+      url:'/parking/area',
       method: 'post',
       data
     })
   }
+export const delAreaList = id => {
+  return request({
+    url:`/parking/area/${id}`,
+    method: 'delete'
+  })
+}
+
+export const getSelectList = () => {
+    return request({
+      url:`/parking/rule/dropList`,
+    })
+}
+export const updateAreaList = (data) => {
+  return request({
+    url:`/parking/area`,
+    method: 'put',
+    data
+  })
+}
