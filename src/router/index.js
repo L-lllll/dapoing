@@ -35,6 +35,14 @@ const router = createRouter({
         }
       ]
     },
+    // 添加企业
+    {
+      path: '/addEnterprise',
+      name: '',
+      hidden: true,
+      component: () => import('@/views/park/addEnterprise.vue'),
+      meta: { title: '添加企业'}
+    },
     parkRouter,
     carRouter,
     propertyRouter,
