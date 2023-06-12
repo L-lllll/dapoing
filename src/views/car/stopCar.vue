@@ -16,30 +16,32 @@ const columns = [
 
 //总计
 const total = ref('')
-const page = ref(1)
-const pageSize = ref(10)
+const list = ref({
+  page:1,
+  pageSize:'10'
+})
 
 //渲染列表数据
 const data = ref(null)
 const getParkManagementListApi = async () => {
-  const res = await getParkManagementList({page:page.value,pageSize:pageSize.value})
+  const res = await getParkManagementList(list.value)
   total.value = res.total
   data.value = res.rows
 }
 //改变页码
-const onShowSizeChange = (current, size) => {
-  page.value = current
-  pageSize.value = size
+const onPageChange = (page,pageSize) => {
+  list.value.page = page
+  list.value.pageSize = pageSize
   getParkManagementListApi()
-};
-const onPageChange = (val) => {
-  page.value = val
-  getParkManagementListApi()
-};
+}
 //页面加载获取数据
 onMounted(() => {
   getParkManagementListApi()
 })
+//搜索按钮
+const searchBtn = () => {
+  getParkManagementListApi()
+}
 </script>
 <template>
   <div class="search_table">
@@ -48,49 +50,63 @@ onMounted(() => {
       <!-- 车牌号码 -->
       <div class="number">
         <label>车牌号码：</label>
-        <a-input v-model:value="value" placeholder="请输入车牌号码" />
+        <a-input v-model:value="list.carNumber" placeholder="请输入车牌号码" />
       </div>
       <!-- 缴纳状态 -->
       <div class="state">
         <label>缴纳状态：</label>
         <a-select
-          v-model:value="value2"
+          v-model:value="list.paymentStatus"
           :size="size"
           placeholder="未选择"
           style="width: 220px"
         >
-        <a-select-option value="">全部</a-select-option>
-        <a-select-option value="0">未缴纳</a-select-option>
-        <a-select-option value="1">已缴纳</a-select-option>
-      </a-select>
+          <a-select-option value="">全部</a-select-option>
+          <a-select-option value="0">未缴纳</a-select-option>
+          <a-select-option value="1">已缴纳</a-select-option>
+        </a-select>
       </div>
       <!-- 查询按钮 -->
-      <a-button type="primary">查询</a-button>
+      <a-button type="primary" @click="searchBtn">查询</a-button>
     </div>
     <!-- 列表内容 -->
     <div class="search-table__main">
-      <a-table bordered:false :dataSource="data" :pagination="false" :ellipsis="true" :columns="columns">
-        <template #bodyCell="{ column,text, index }">
+      <a-table
+        bordered:false
+        :dataSource="data"
+        :pagination="false"
+        :ellipsis="true"
+        :columns="columns"
+      >
+        <template #bodyCell="{ column, text, index }">
           <template v-if="column.key === 'number'">
-            <span>{{ (page - 1) * pageSize + index + 1 }}</span>
+            <span>{{ (list.page - 1) * list.pageSize + index + 1 }}</span>
           </template>
           <!-- 判断收费类型 -->
-          <template v-if="column.dataIndex==='chargeType'">
+          <template v-if="column.dataIndex === 'chargeType'">
             <span>{{ text === 'card' ? '月卡' : '临时停车' }}</span>
           </template>
           <!-- 判断缴纳状态 -->
-          <template v-if="column.dataIndex==='paymentStatus'">
+          <template v-if="column.dataIndex === 'paymentStatus'">
             <span>{{ text === '0' ? '未缴纳' : '已缴纳' }}</span>
           </template>
           <!-- 判断支付方式 -->
-          <template v-if="column.dataIndex==='paymentMethod'">
+          <template v-if="column.dataIndex === 'paymentMethod'">
             {{ text === 'Alipay' ? '支付宝' : data.paymentMethod === 'WeChat' ? '微信' : '线下' }}
           </template>
         </template>
       </a-table>
     </div>
     <div id="components-pagination-demo-mini">
-      <a-pagination @change="onPageChange" @showSizeChange="onShowSizeChange" size="small" :total="total" show-size-changer show-quick-jumper :show-total="total => `共 ${total} 条`"/>
+      <a-pagination
+        @change="onPageChange"
+        @showSizeChange="onShowSizeChange"
+        size="small"
+        :total="total"
+        show-size-changer
+        show-quick-jumper
+        :show-total="(total) => `共 ${total} 条`"
+      />
     </div>
   </div>
 </template>
@@ -124,7 +140,7 @@ onMounted(() => {
 .ant-btn {
   border-radius: 4px;
 }
-#components-pagination-demo-mini{
+#components-pagination-demo-mini {
   margin-top: 20px;
   float: right;
   padding-bottom: 20px;
