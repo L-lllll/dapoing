@@ -1,14 +1,17 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { getTableList } from '@/api/propertyFee.js'
+import { getTableList,delBill } from '@/api/propertyFee.js'
+import ModalIndex from './components/modalIndex.vue';
+import { Modal,message } from 'ant-design-vue';
 const format = ref([])
+const searchName = ref('')
 const searchForm = computed(() => {
   return {
     page: 1,
     pageSize: 10,
     start: format.value[0],
     end: format.value[1],
-    enterpriseName:''
+    enterpriseName: searchName.value
   }
 })
 const onFinish = () => {
@@ -75,6 +78,30 @@ const onChange = (pageSize,page) => {
   searchForm.value.pageSize = page
   getTableListAPI()
 }
+// 显示弹框
+const visible = ref(false)
+//查看
+const modelId = ref('')
+const showModal = (id) => {
+  if(typeof(id) === 'number') {
+    modelId.value = id
+  } else {
+    modelId.value = false
+  }
+  visible.value = true
+}
+
+const delBillAPI = async (id) => {
+  Modal.confirm({
+    title:"你确定要删除这条信息嘛",
+    async onOk() {
+      await delBill(id)
+      getTableListAPI()
+      message.success('删除成功')
+    }
+  })
+
+}
 </script>
 <template>
   <div class="search" :model="searchForm" @finish="onFinish">
@@ -83,14 +110,14 @@ const onChange = (pageSize,page) => {
         <a-space :size="16">
           <a-form-item label="企业名称">
             <a-input
-              v-model:value="searchForm.enterpriseName"
+              v-model:value="searchName"
               placeholder="请输入企业名称"
               style="width: 220px"
             ></a-input>
           </a-form-item>
           <a-form-item label="缴费时间">
             <a-range-picker
-              v-model="format"
+              v-model:value="format"
               format="YYYY-MM-DD"
               valueFormat="YYYY-MM-DD"
               style="width: 260px"
@@ -104,7 +131,7 @@ const onChange = (pageSize,page) => {
     </a-form>
   </div>
   <div class="table">
-    <a-button type="primary" class="add">添加账单</a-button>
+    <a-button type="primary" class="add" @click="showModal">添加账单</a-button>
     <a-table :dataSource="tableList" :columns="columns" :pagination="false" :scroll="{ x: 1200 }">
       <template #headerCell="{ title, column }">
         <span v-if="column.key === 'propertyFeePrice'">{{ title }} <sub>2</sub>)</span>
@@ -114,8 +141,8 @@ const onChange = (pageSize,page) => {
           <span>{{ tableList.indexOf(record) + 1 }}</span>
         </template>
         <template v-if="column.dataIndex === 'operation'">
-          <a-button type="text" style="color:#4770ff">查看</a-button>
-          <a-button type="text" style="color:#4770ff">删除</a-button>
+          <a-button type="text" style="color:#4770ff" @click="showModal(record.id)">查看</a-button>
+          <a-button type="text" style="color:#4770ff" @click="delBillAPI(record.id)">删除</a-button>
         </template>
       </template>
     </a-table>
@@ -125,12 +152,13 @@ const onChange = (pageSize,page) => {
     <a-pagination
       size="small"
       show-size-changer
-      v-model="res"
       show-quick-jumper
       :total="totals"
       @change="onChange"
     />
   </a-row>
+  <ModalIndex v-model:visible="visible" v-model:modelId="modelId" @addSuccess="getTableListAPI" v-if="modelId"></ModalIndex>
+  <ModalIndex v-model:visible="visible" @addSuccess="getTableListAPI" v-else></ModalIndex>
 </template>
 <style lang="less">
 .ant-layout-content {
@@ -200,5 +228,8 @@ input,
 .ant-table-thead > tr > th {
   height: 48px;
   background: #f4f6f8;
+}
+.ant-picker {
+  width: 100%;
 }
 </style>
