@@ -1,6 +1,8 @@
 <script setup>
 import {ref,onMounted} from 'vue'
-import {getEnterpriseList,getRentList,getBulidingList} from '@/api/enterPrise.js'
+import {getEnterpriseList,getRentList,getBulidingList,updateFile,addContract} from '@/api/enterPrise.js'
+import { UploadOutlined} from '@ant-design/icons-vue';
+import {message} from 'ant-design-vue'
 import dayjs from 'dayjs';
 // 渲染列表
 const enterpriseList = ref(null)
@@ -10,10 +12,7 @@ const total = ref(0)
 const showDomal = ref(false)
 // 指定modal挂载的节点
 const createCreative = ref(null);
-const times = ref([dayjs('2015/01/01', 'YYYY/MM/DD'), dayjs('2015/01/01', 'YYYY/MM/DD')])
-const handleOk = () => {
-  console.log(times.value)
-}
+
 const list = ref({
   name:'',
   page:1,
@@ -119,21 +118,107 @@ const searchBtn = () => {
 }
 
 // 添加/续约合同对话框展示
-const modalList = ref({
+let modalList = ref({
   buildingId:'',
   startTime:'',
   endTime:'',
   contractUrl:'',
   contractId:'',
-  type:'',
+  type:0,
   enterpriseId:''
 })
+// 添加合同规则
+const modalRules = ({
+  buildingId:[{required:true,message:'请选择租赁的楼宇',trigger:'blur'}],
+  endTime:[{required:true,message:'请选择租赁起止日期',trigger:'blur'}],
+  contractUrl:[{required:true,message:'请上传租赁合同',trigger:'blur'}],
+})
+// 获取租赁楼宇
 const bulidingList = ref(null)
-const changeDomal = async() => {
+// 点击添加合同
+const changeDomal = async(id) => {
+  modalList.value.type = 0
   bulidingList.value = await getBulidingList()
+  modalList.value.enterpriseId = id
   showDomal.value = true
-  console.log(bulidingList.value)
+}
+// 选取的时间发生改变
+const times = ref(null)
+const onTimeChange = (value) => {
+  modalList.value.startTime = dayjs(value[0]).format('YYYY-MM-DD')
+  modalList.value.endTime = dayjs(value[1]).format('YYYY-MM-DD')
+}
+// 上传文件
+const beforeUpload = (file) => {
+  const isLt5M = file.size / 1024 / 1024 < 5
+  if (!isLt5M) {
+    message.error('上传文件大小不能超过 5MB!')
+    return isLt5M
+  }
+}
+const fileList = ref(null)
+const updated = async(e) => {
+    try{
+    const file = e.file
+    const formData = new FormData()
+    formData.append('file', file.originFileObj, file.name);
+    formData.append('type','contract')
+    e.file.status = 'success'
+    const res = await updateFile(formData)
+    modalList.value.contractUrl = res.url
+    modalList.value.contractId = res.id
+  }catch(e){
+    console.log(e)
+  }
+}
+// 提交合同
+const handleOk = async() => {
+  // 新增合同
+  if(modalList.value.type === 0) {
+      try{
+      await addContract(modalList.value)
+      message.success('添加合同成功')
+      onCancel()
+    }catch(e){ /* empty */ }
+  }
+  // 修改合同
+  else {
+    try{
+      await addContract(modalList.value)
+      message.success('续约合同成功')
+      onCancel()
+    }catch(e){ /* empty */ }
+  }
 
+}
+const formDom = ref(null)
+const onCancel = () => {
+  formDom.value.resetFields()
+  // 数据全是二次修改,重置表单需要将原有数据清空
+  modalList.value = {
+  // 续租有初始租赁楼宇和起始时间
+    buildingId:'',
+    startTime:'',
+    endTime:'',
+    contractUrl:'',
+    contractId:'',
+    type:'',
+    enterpriseId:''
+  }
+  fileList.value = null
+  times.value =null
+  showDomal.value = false
+}
+// 续租
+const renewal = async(record) => {
+  // 续租有初始租赁楼宇和起始时间
+  try{
+  modalList.value.type = 1
+  modalList.value.buildingId = record.buildingId
+  modalList.value.startTime = record.startTime
+  showDomal.value = true
+  await getBulidingList()
+  }catch(e){ /* empty */ }
 }
 // 挂载调用
 onMounted(() => {
@@ -186,7 +271,7 @@ onMounted(() => {
                 <a-tag v-if="record.status === 3">已退租</a-tag>
               </template>
               <template v-if="column.key === 'action'">
-                <a-button :disabled="record.renewFlag === 0 ? true : false" type="link" style="padding: 4px 15px 4px 0;">续租</a-button>
+                <a-button :disabled="record.renewFlag === 0 ? true : false" type="link" style="padding: 4px 15px 4px 0;" @click="renewal(record)">续租</a-button>
                 <a-button :disabled="record.exitFlag === 0 ? true : false" type="link" style="padding: 4px 15px 4px 0;">退租</a-button>
                 <a-button :disabled="record.exitFlag === 0 ? false : true" type="link" style="padding: 4px 15px 4px 0;">删除</a-button>
               </template> 
@@ -219,19 +304,42 @@ onMounted(() => {
           ok-text="确认"
           cancel-text="取消"
           @ok="handleOk"
+          @cancel="onCancel"
           style="width: 580px;
         ">
-        <a-form ref="formDom" layout="vertical">
-            <a-form-item label="租赁楼宇" :label-col="{ span: 10 }" :wrapper-col="{ span: 24 }">
-              <a-select v-model:value="modalList.buildingId">
+        <a-form ref="formDom" layout="vertical" :model="modalList" :rules="modalRules">
+            <a-form-item label="租赁楼宇" :label-col="{ span: 10 }" :wrapper-col="{ span: 24 }" name="buildingId">
+              <a-select 
+              v-model:value="modalList.buildingId" 
+              :disabled="modalList.type === 1 ? true : false" 
+              placeholder="请选择租赁的楼宇"
+              >
                 <a-select-option v-for=" item in bulidingList" :key="item.id" :value="item.id"> {{ item.name }}</a-select-option>
               </a-select>
             </a-form-item>
-            <a-form-item label="租赁起止时间" :label-col="{ span: 10 }">
-              <a-range-picker v-model:value="times" style="width: 100%;"/>
+            <a-form-item label="租赁起止时间" :label-col="{ span: 10 }" name="endTime" >
+              <a-range-picker style="width: 100%;" @change="onTimeChange" v-model:value="times" :disabled="modalList.type === 0 ? [false, false] :[true,false]"/>
             </a-form-item>
-            <a-form-item label="租赁合同" :label-col="{ span: 10 }" :wrapper-col="{ span: 24 }">
-              <a-input-password placeholder="请输入" style="width: 100%;"></a-input-password>
+            <a-form-item label="租赁合同" :label-col="{ span: 10 }" :wrapper-col="{ span: 24 }" name="contractUrl">
+              <a-upload 
+              v-model:file-list="fileList" 
+              :before-upload="beforeUpload"
+              @change="updated"
+              accept=".doc,.docx,.pdf"
+              >
+                <a-button type="primary">
+                  <upload-outlined></upload-outlined>
+                  上传文件
+                </a-button>
+                <template #itemRender="{ file, actions }">
+                  <a-space>
+                    <span :style="file.status === 'error' ? 'color: red' : ''">{{ file.name }}</span>
+                      <a href="javascript:;" @click="actions.download">下载</a>
+                      <a href="javascript:;" @click="actions.remove">删除</a>
+                  </a-space>
+                </template>
+              </a-upload>
+              <div>支持扩展名：.doc .docx .pdf, 文件大小不得超过5M</div>
             </a-form-item>
           </a-form>
       </a-modal>

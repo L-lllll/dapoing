@@ -94,7 +94,6 @@ let showDialog = ref(false)
   width: 1196px;
   height: 52px;
   display: flex;
-  /* margin-bottom: 20px; */
 }
 .ant-input {
   width: 220px;

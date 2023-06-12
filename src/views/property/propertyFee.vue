@@ -1,7 +1,8 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { getTableList } from '@/api/propertyFee.js'
+import { getTableList,delBill } from '@/api/propertyFee.js'
 import ModalIndex from './components/modalIndex.vue';
+import { Modal,message } from 'ant-design-vue';
 const format = ref([])
 const searchName = ref('')
 const searchForm = computed(() => {
@@ -79,15 +80,27 @@ const onChange = (pageSize,page) => {
 }
 // 显示弹框
 const visible = ref(false)
-// true => 查看 false => 编辑
+//查看
 const modelId = ref('')
 const showModal = (id) => {
-  if(id) {
+  if(typeof(id) === 'number') {
     modelId.value = id
   } else {
     modelId.value = false
   }
   visible.value = true
+}
+
+const delBillAPI = async (id) => {
+  Modal.confirm({
+    title:"你确定要删除这条信息嘛",
+    async onOk() {
+      await delBill(id)
+      getTableListAPI()
+      message.success('删除成功')
+    }
+  })
+
 }
 </script>
 <template>
@@ -129,7 +142,7 @@ const showModal = (id) => {
         </template>
         <template v-if="column.dataIndex === 'operation'">
           <a-button type="text" style="color:#4770ff" @click="showModal(record.id)">查看</a-button>
-          <a-button type="text" style="color:#4770ff">删除</a-button>
+          <a-button type="text" style="color:#4770ff" @click="delBillAPI(record.id)">删除</a-button>
         </template>
       </template>
     </a-table>
@@ -144,7 +157,8 @@ const showModal = (id) => {
       @change="onChange"
     />
   </a-row>
-  <ModalIndex v-model:visible="visible" @addSuccess="getTableListAPI"></ModalIndex>
+  <ModalIndex v-model:visible="visible" v-model:modelId="modelId" @addSuccess="getTableListAPI" v-if="modelId"></ModalIndex>
+  <ModalIndex v-model:visible="visible" @addSuccess="getTableListAPI" v-else></ModalIndex>
 </template>
 <style lang="less">
 .ant-layout-content {

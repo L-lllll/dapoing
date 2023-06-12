@@ -12,6 +12,9 @@ request.interceptors.request.use(config => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }
+  if(config.data instanceof FormData) {
+    config.headers['Content-Type'] = 'multipart/form-data'
+  }
   return config
 }, error => Promise.reject(error))
 
@@ -21,10 +24,6 @@ request.interceptors.response.use(
     const { code, msg, data } = response.data
     if (code === 10000) {
       return data 
-    }
-    if(code === 50000) {
-      message.error(msg)
-      return data
     }
     return Promise.reject(new Error(msg))
   },error => {
