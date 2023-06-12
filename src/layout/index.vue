@@ -26,12 +26,13 @@ const collapsed = ref(false)
 .app-layout {
   min-height: 100vh;
   display: flex;
-  ::v-deep .ant-layout-sider {
+  :deep(.ant-layout-sider) {
     flex: 0 0 260px !important;
     width: 260px !important;
     min-width: 260px !important;
     background-color: #fff !important;
-    overflow: auto;
+    // overflow: auto;
+    position: fixed;
     height: 100vh;
     .logo {
       height: 60px;
@@ -41,6 +42,7 @@ const collapsed = ref(false)
   .right-layout {
     flex: 1;
     height: 100vh;
+    margin-left: 260px;
     overflow-y: auto;
   }
   .ant-layout-header {
@@ -78,5 +80,6 @@ const collapsed = ref(false)
 .ant-layout-content{
   margin: 0 20px;
   background: #ffffff;
+  overflow: auto;
 }
 </style>

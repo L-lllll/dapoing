@@ -2,12 +2,12 @@
 
 </script>
 <template>
-    <div class="main">
-    <div class="warnTitle">
-        <a-form type="flex" justify="start">   
+ <div class="main">
+ <div class="warnTitle">
+    <a-form type="flex" justify="start">   
         <a-row :gutter="24">
             <a-col :span="8">
-              <a-form-item >
+            <a-form-item >
               告警详情
          </a-form-item>
      </a-col>
