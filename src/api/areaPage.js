@@ -14,22 +14,45 @@ export const addAreaList = data => {
       data
     })
   }
+  // 删除区域
 export const delAreaList = id => {
   return request({
     url:`/parking/area/${id}`,
     method: 'delete'
   })
 }
-
+// 获取下拉列表
 export const getSelectList = () => {
     return request({
       url:`/parking/rule/dropList`,
     })
 }
+// 编辑区域
 export const updateAreaList = (data) => {
   return request({
     url:`/parking/area`,
     method: 'put',
     data
+  })
+}
+// 获取月卡列表
+export const getMouthList = (params) => {
+  return request({
+    url:`/parking/card/list`,
+    params
+  })
+}
+// 获取月卡信息
+export const getMouthCard = () => {
+  return request({
+    url: '/parking/card/proportion'
+  })
+}
+
+// 删除月卡
+export const delMouthList = id => {
+  return request({
+    url:`/parking/card/${id}`,
+    method: 'delete'
   })
 }

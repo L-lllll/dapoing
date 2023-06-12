@@ -152,6 +152,7 @@ Modal.confirm({
 }
 const addAreaListAPI = (record) => {
   console.log(record)
+  title.value = '编辑区域'
   ruleList.value.areaName = record.areaName
   ruleList.value.id = record.id
   ruleList.value.spaceNumber = record.spaceNumber
@@ -164,6 +165,17 @@ const close = () => {
   ruleRef.value.resetFields()
   showDialog.value = false
 }
+const addArea = () => {
+  ruleList.value = {
+  areaName:'',
+  spaceNumber: '',
+  areaProportion: '',
+  ruleId: undefined,
+  remark: ''
+}
+title.value = '添加区域'
+showDialog.value = true
+}
 const selectList = ref([])
 const createCreative = ref(null);
 const data = ref([])
@@ -175,6 +187,7 @@ const ruleList = ref({
   ruleId: '',
   remark: ''
 })
+const title = ref('')
 const submit = async() => {
   console.log(ruleList)
   if(ruleList.value.id){
@@ -194,7 +207,7 @@ onMounted(() => {
 </script>
 <template>
   <div style="padding: 20px 20px 0;overflow: hidden">
-    <a-button style="border-radius: 4px;margin-bottom: 20px;" type="primary" @click="showDialog = true">添加区域</a-button>
+    <a-button style="border-radius: 4px;margin-bottom: 20px;" type="primary" @click="addArea">添加区域</a-button>
     <div style="width: 100%;height: 100%;background-color: #fff;">
       <a-table :bordered="false" :pagination="false" :ellipsis="true" :columns="columns" :data-source="data">
         <template #bodyCell="{ record,column,index }">
@@ -219,7 +232,7 @@ onMounted(() => {
     <a-modal
     :getContainer="() => createCreative"
      :visible="showDialog" 
-     title="添加区域"
+     :title="title"
      @cancel="close"
      @ok="submit"
      destroyOnClose>
@@ -276,9 +289,6 @@ onMounted(() => {
 }
 :deep(.ant-modal-header){
   margin-bottom:0px;
-}
-:deep(.ant-table-container table > thead > tr:first-child th:last-child){
-  
 }
 :deep(.ant-modal-root .ant-modal .ant-modal-content .ant-btn){
   border-radius: 8px;
