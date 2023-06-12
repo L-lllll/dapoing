@@ -4,7 +4,7 @@ import request from "@/untils/request";
 // 获取列表
 // 获取账单详情
 export const getTableList = params => {
-  if (typeof(params) === 'string') {
+  if (typeof(params) === 'number') {
     return request.get(`/park/propertyfee/${params}`)
   }
   return request.get('/park/propertyfee',{ params })
@@ -24,4 +24,8 @@ export const getPayment = (data) => {
 // 添加账单
 export const addBill = (data) => {
   return request.post('park/propertyfee',data)
+}
+// 删除账单
+export const delBill = (id) => {
+  return request.delete(`park/propertyfee/${id}`)
 }

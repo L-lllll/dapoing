@@ -26,3 +26,31 @@ export const getBulidingList = () => {
     url:'park/rent/building'
   })
 }
+// 上传文件
+export const updateFile = data => {
+  return request({
+    url:'/upload',
+    method:'post',
+    data
+  })
+}
+// 删除企业
+export const delEnterprise = id => {
+  return request({
+    url:`park/enterprise/${id}`,
+    method:'delete'
+  })
+}
+// 删除合同
+export const delRent = id => {
+  return request({
+    url:`park/enterprise/rent/${id}`,
+    method:'delete'
+  })
+}
+// 所在行业
+export const industry = () => {
+  return request({
+    url:'park/industry'
+  })
+}
