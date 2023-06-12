@@ -48,3 +48,9 @@ export const delRent = id => {
     method:'delete'
   })
 }
+// 所在行业
+export const industry = () => {
+  return request({
+    url:'park/industry'
+  })
+}
