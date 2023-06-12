@@ -10,7 +10,7 @@ const columns = [
   { title: '序号', key: 'number' },
   { title: '楼宇名称', dataIndex: 'name', key: 'name' },
   { title: '层数', dataIndex: 'floors', key: 'floors' },
-  { title: '在管面积(㎡)', dataIndex: 'area', key: 'area'},
+  { title: '在管面积(㎡)', dataIndex: 'area', key: 'area' },
   { title: '层物业费(元/㎡)', dataIndex: 'propertyFeePrice', key: 'propertyFeePrice' },
   { title: '状态', dataIndex: 'status', key: 'status' },
   { title: '操作', dataIndex: 'demoFlag', key: 'demoFlag' }
@@ -30,9 +30,9 @@ const getBuildingAPI = async () => {
 }
 //分页
 const total = ref(0)
-const onShowSizeChange = (page, pageSize) => {
-  list.value = page
-  list.value = pageSize
+const onPageChange = (val1, val2) => {
+  data.value.page = val1
+  data.value.pageSize = val2
   getBuildingAPI()
 }
 const showDialog = ref(false)
@@ -48,6 +48,7 @@ const editRow = (id) => {
 }
 
 //删除
+
 const delBuildingAPI = (id) => {
   Modal.confirm({
     title: '提示',
@@ -60,8 +61,10 @@ const delBuildingAPI = (id) => {
   })
 }
 
-//查询
-
+// 搜索按钮
+const searchBtn = () => {
+  getBuildingAPI()
+}
 </script>
 <template>
   <!-- 头部搜索框 -->
@@ -70,20 +73,31 @@ const delBuildingAPI = (id) => {
     <div class="search-table_header">
       <a-space>
         <span>楼宇名称:</span>
-        <a-input v-model:value="value" placeholder="请输入楼宇名称" style="width: 220px" />
-        <a-button @click="query" type="primary">查询</a-button>
+        <a-input
+          v-model:value="data.name"
+          placeholder="请输入楼宇名称"
+          style="width: 220px; border-radius: 4px"
+        />
+        <a-button @click="searchBtn" type="primary" style="margin-left: 10px">查询</a-button>
       </a-space>
     </div>
-    <!-- 表单区域 -->
     <div class="search-table__main">
-      <a-button type="primary" @click="showDialog = true">添加楼宇</a-button>
+      <a-button type="primary"  style="border-radius: 4px;margin-bottom: 20px;" @click="showDialog = true">添加楼宇</a-button>
       <add-buliding :showDialog="showDialog"></add-buliding>
+      <!-- 表单区域 -->
       <a-table :dataSource="list" :columns="columns" :pagination="false">
         <template #bodyCell="{ index, column, record }">
           <a-space v-if="column.dataIndex === 'demoFlag'">
-            <a-button type="link" style="padding: 4px 15px 4px 0" @click="editRow(record.id)">编辑</a-button>
-              <!-- 删除禁用  disabled  租赁中删除禁用-->
-            <a-button :disabled="record.status === 1 ? true : false" type="link" style="padding: 4px 15px 4px 0" @click="delBuildingAPI(record.id)">删除</a-button>
+            <a-button type="link" style="padding: 4px 15px 4px 0" @click="editRow(record.id)"
+              >编辑</a-button>
+            <!-- 删除禁用  disabled  租赁中删除禁用-->
+            <a-button
+              :disabled="record.status === 1 ? true : false"
+              type="link"
+              style="padding: 4px 15px 4px 0"
+              @click="delBuildingAPI(record.id)"
+              >删除</a-button
+            >
           </a-space>
           <template v-if="column.key === 'number'">
             <span>{{ (data.page - 1) * data.pageSize + index + 1 }}</span>
@@ -97,13 +111,16 @@ const delBuildingAPI = (id) => {
       <add-buliding
         ref="addBuildingRef"
         v-model:showDialog="showDialog"
-        @addSuccess="getBuildingAPI"></add-buliding>
+        @addSuccess="getBuildingAPI">
+      </add-buliding>
     </div>
     <!-- 分页 -->
     <div class="my-pagination-wrapper">
       <a-pagination
+        :current="data.page"
+        :pageSize="data.pageSize"
+        :pageSizeOptions="[10, 20, 40, 50]"
         @change="onPageChange"
-        @showSizeChange="onShowSizeChange"
         size="small"
         :total="total"
         show-size-changer
@@ -116,13 +133,16 @@ const delBuildingAPI = (id) => {
 
 <style scoped>
 .search-table {
-  padding: 20px 20px 0;
+  width: 100%;
+  height: 100%;
+  padding: 20px;
+  min-width: 1116px;
+  background-color: #fff;
 }
 .search-table_header {
+  height: 52px;
+  border-bottom: 1px solid #e5e5e5;
   margin-bottom: 20px;
-  display: flex;
-  border-bottom: 1px solid rgba(237, 237, 237, 0.9);
-  height: 50px;
 }
 .search-table__main {
   margin-bottom: 20px;
@@ -132,4 +152,5 @@ const delBuildingAPI = (id) => {
   margin: 0;
   padding: 0;
 }
+
 </style>
