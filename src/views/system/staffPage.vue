@@ -1,6 +1,7 @@
 <script setup>
 import { ref,onMounted} from "vue";
-import {getUserManagement} from '../../api/system/staff.js'
+import { Modal, message } from 'ant-design-vue'
+import {getUserManagement,delStaff,ResetPassword} from '../../api/system/staff.js'
 import addVisible from '../system/components/addVisible.vue'
 //获取分页数据的请求信息
 const userInfo=ref({page:1,pageSize:10,name:''})
@@ -29,6 +30,29 @@ onMounted(()=>{
   total.value=res.total
   dataSource.value=res.rows
  }
+//  删除用户
+const delStaffAPI=async(id)=>{
+  Modal.confirm({
+      title: '提示',
+      content: '确认要删除该角色吗',
+      async onOk(){
+        await ResetPassword(id)
+        message.success("删除用户成功")
+        getUser()
+      }
+   })
+}
+// 重置密码
+const reset=(id)=>{
+  Modal.confirm({
+      title: '提示',
+      content: '确定将密码重置为"123456"?',
+      async onOk(){
+        await delStaff(id)
+        message.success("重置密码成功")
+      }
+   })
+}
  //查询
  const Inquire=()=>{
   getUser()
@@ -37,6 +61,12 @@ onMounted(()=>{
 //  打开弹窗
 const IncreaseStaff=()=>{
   Staff.value=true
+}
+//编辑
+const userId=ref({})
+const adit=(record)=>{
+  IncreaseStaff()
+  userId.value=record
 }
 </script>
 <template>
@@ -72,9 +102,9 @@ const IncreaseStaff=()=>{
 {{record.createTime  }}
     </template>
       <div v-if="column.dataIndex === 'adit'" class="operate">
-         <a-button type="text" style="color: #7094ff;">编辑</a-button>
-         <a-button  type="text" style="color: #7094ff;">删除</a-button>
-         <a-button  type="text" style="color: #7094ff;">重置密码</a-button>
+         <a-button type="text" style="color: #7094ff;" @click="adit(record)">编辑</a-button>
+         <a-button  type="text" style="color: #7094ff;"  @click="delStaffAPI(record.id)">删除</a-button>
+         <a-button  type="text" style="color: #7094ff;" @click="reset(record.id)">重置密码</a-button>
       </div>
       </template>
     </a-table>
@@ -91,7 +121,7 @@ const IncreaseStaff=()=>{
   </a-pagination>
 </div>
 </div>
-<addVisible v-model:Staff="Staff"></addVisible>
+<addVisible v-model:Staff="Staff" @addSuccess="getUser" :userId="userId"></addVisible>
 </template>
 <style scoped lang="less">
 .content{
