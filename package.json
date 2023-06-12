@@ -10,8 +10,8 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
-    "@antv/g2plot": "^2.4.31",
     "@ant-design/icons-vue": "^6.1.0",
+    "@antv/g2": "^5.0.12",
     "ant-design-vue": "^3.2.20",
     "axios": "^1.4.0",
     "dayjs": "^1.11.8",
