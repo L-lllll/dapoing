@@ -56,3 +56,12 @@ export const delMouthList = id => {
     method: 'delete'
   })
 }
+
+// 添加月卡
+export const addMouthList = data => {
+  return request({
+    url: '/parking/card',
+    method: 'post',
+    data
+  })
+}
