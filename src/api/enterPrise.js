@@ -34,3 +34,23 @@ export const updateFile = data => {
     data
   })
 }
+// 删除企业
+export const delEnterprise = id => {
+  return request({
+    url:`park/enterprise/${id}`,
+    method:'delete'
+  })
+}
+// 删除合同
+export const delRent = id => {
+  return request({
+    url:`park/enterprise/rent/${id}`,
+    method:'delete'
+  })
+}
+// 所在行业
+export const industry = () => {
+  return request({
+    url:'park/industry'
+  })
+}

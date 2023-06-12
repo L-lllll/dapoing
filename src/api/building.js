@@ -3,7 +3,7 @@ import request from '@/untils/request'
 //楼宇修改
 export function updateBuilding(data) {
   return request({
-  url: `/park/building/${data.id}`,
+  url: `/park/building/`,
   method: 'put',
   data
   })
@@ -15,11 +15,17 @@ export function getBuilding(params) {
   params
   })
 }
-//楼宇删除
+//楼宇删除---租赁中不支持删除
+export function delBuilding(id) {
+  return request({
+  url: `/park/building/${id}`,
+  method: 'delete',
+  })
+}
 //楼宇新增
 export function addBuilding(data) {
   return request({
-  url: `/park/building/${data}`,
+  url: `/park/building/`,
   method: 'post',
   data
   })
