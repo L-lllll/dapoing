@@ -213,6 +213,9 @@ const getbuil = async () => {
   .ant-form-horizontal .ant-form-item-label {
     text-align: left;
   }
+  .ant-picker {
+    width: 100%;
+  }
 }
 
 .lookBuil {
