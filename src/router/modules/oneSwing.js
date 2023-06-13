@@ -23,7 +23,9 @@ export default {
       path: '/warningPageDetail',
       name: '',
       component: () => import('@/views/oneSwing/warningPageDetail.vue'),
-      meta: { title: '告警详情'}
+      meta: { title: '告警详情'},
+      hidden: true
+
     },
   ]
 }

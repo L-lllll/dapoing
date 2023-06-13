@@ -1,8 +1,10 @@
 <script setup>
-import {getWarnList,delWarn} from '@/api/warningPage'
+import {getWarnList,delWarn,getWarnDetail} from '@/api/warningPage'
 import { onMounted,reactive,ref} from 'vue'
 import { Modal } from 'ant-design-vue'
-// import { route } from 'vue-router';
+import { useRouter } from 'vue-router'; 
+import { setId } from '../../untils/storage';
+const router = useRouter()
 const list = ref([])
 // const searchList=ref([])
 const columns = [ 
@@ -46,13 +48,18 @@ const getWarnListAPI = async() => {
   })
 
  }
-// const getDetail = (id) =>{
-//   console.log(id)
-//   router.push({
-//     path:'/warningPageDetail'
-// @click="getDetail(record.id)"
-//   })
-// }
+const getDetail = async(id) =>{
+  const res = await getWarnDetail(id)
+  console.log(res)
+  console.log(id)
+  setId(res)
+  router.push({
+    path:'/warningPageDetail',
+    query:{
+      id:res.id
+    }
+  })
+}
  
  const changePage = (page, pagesize,total) => {
   console.log(page,pagesize,total)
@@ -122,9 +129,9 @@ const getWarnListAPI = async() => {
     <template #bodyCell="{ record,column }">
             <template v-if="column.dataIndex === 'operate'">
               <a-space>
-                <a-button type="primary" size="small" :disabled="true">派单</a-button>
-                <a-button type="primary" size="small" >详情</a-button>
-                <a-button size="small" @click="delWarnAPI(record.id)">删除</a-button>
+                <a-button  type="text" size="small" :disabled="true">派单</a-button>
+                <a-button  type="link"  size="small" @click="getDetail(record.id)">详情</a-button>
+                <a-button  type="link" size="small" @click="delWarnAPI(record.id)">删除</a-button>
               </a-space>
             </template>
             <template v-if="column.dataIndex === 'handleStatus'">
@@ -135,7 +142,7 @@ const getWarnListAPI = async() => {
             </template>
       </template>
   </a-table>
-  <span>{{ `共${pageParams.total}条`}}</span>
+  <!-- <span>{{ `共${pageParams.total}条`}}</span> -->
 </template>
 <style>
 .main-top{
