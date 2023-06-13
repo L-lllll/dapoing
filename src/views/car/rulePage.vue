@@ -50,6 +50,18 @@ const DelRuleApi = (id) =>{
     }
   })
 }
+const addRulesRef = ref(null)
+//编辑功能
+const editRow = (id) =>{
+  showDialog.value = true
+  //ref调用子组件
+  console.log(addRulesRef.value)
+  console.log(id)
+  addRulesRef.value.getRuleDetailApi(id) //调用子组件的方法
+  
+  
+
+}
 //弹层状态
 let showDialog = ref(false)
 
@@ -67,7 +79,7 @@ let showDialog = ref(false)
       <a-table bordered:false :dataSource="data" :pagination="false" :ellipsis="true"  :columns="columns">
         <template #bodyCell="{ column,text,index,record }">
           <template v-if="column.dataIndex === 'operate'">
-           <a-button type="link" style="padding: 4px 15px 4px 0;">编辑</a-button>
+           <a-button type="link" style="padding: 4px 15px 4px 0;" @click="editRow(record.id)">编辑</a-button>
            <a-button type="link" style="padding: 4px 15px 4px 0;" @click="DelRuleApi(record.id)">删除</a-button>
           </template>
           <template v-if="column.key === 'number'">
@@ -80,10 +92,10 @@ let showDialog = ref(false)
       </a-table>
     </div>
     <div id="components-pagination-demo-mini">
-      <a-pagination @change="onPageChange" @showSizeChange="onShowSizeChange" size="small" :total="total" show-size-changer show-quick-jumper :show-total="total => `共 ${total} 条`"/>
+      <a-pagination @change="onPageChange" size="small" :total="total" show-size-changer show-quick-jumper :show-total="total => `共 ${total} 条`"/>
       </div>
     </div>
-    <add-rules v-model:showDialog="showDialog"></add-rules>
+    <add-rules ref="addRulesRef" v-model:showDialog="showDialog" @addSuccess="getRuleListApi"></add-rules>
   </template>
 <style scoped>
 .search_table {

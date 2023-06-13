@@ -2,6 +2,8 @@
 import { ref, onMounted } from 'vue';
 import { getMouthList, getMouthCard,delMouthList } from '../../api/areaPage'
 import { Modal, message } from 'ant-design-vue'
+import { useRouter } from 'vue-router'; 
+const router = useRouter()
 // 表单
 const columns = [
   {
@@ -129,6 +131,10 @@ const columns = [
     }
   },
 ];
+// 跳转页面
+const goToAddMouth = () => {
+  router.push('/addmouth')
+}
 // 数据列表
 const mouthList = ref([])
 const infoData = ref({})
@@ -165,9 +171,13 @@ const delMore = () => {
     async onOk(){
       if(delId.value.includes(1) || delId.value.includes(2) || delId.value.includes(3) || delId.value.includes(4) || delId.value.includes(5)){
         message.error('演示数据不允许操作')
+        getMouthListAPI()
+
       } else {
-        await delMouthList(delId)
+        await delMouthList(delId.value)
         message.success('删除月卡成功')
+        getMouthListAPI()
+
       }
     }
   })
@@ -175,19 +185,22 @@ const delMore = () => {
 }
 // 删除月卡功能
 const delMouthAPI = (id) => {
-  // console.log(id)
+  console.log(id)
+
   Modal.confirm({
     content: '是否确定删除月卡',
     async onOk(){
       if(id===1 || id===2 || id===3 || id===4 || id===5){
         message.error('演示数据不允许操作')
+        getMouthListAPI()
+
       } else {
-        await delMouthList(delId)
+        await delMouthList(id)
         message.success('删除月卡成功')
+        getMouthListAPI()
       }
     }
   })
-  getMouthListAPI()
 }
 
 // 改变每页条数
@@ -240,7 +253,7 @@ onMounted(() => {
       </a-form-item>
     </a-form>
     <div class="box">
-      <a-button type="primary" style="margin-right: 10px;border-radius: 5px;">添加月卡</a-button>
+      <a-button type="primary" style="margin-right: 10px;border-radius: 5px;" @click="goToAddMouth">添加月卡</a-button>
       <a-button type="primary" style="margin-right: 10px;border-radius: 5px;" @click="delMore">批量删除</a-button>
       <div class="info"><span class="icon">i</span> 本园区共计 {{infoData.spaceNumber}} 个车位, 月卡用户 {{infoData.cardCount}} 人, 车位占有率 {{ infoData.proportion }}</div>
     </div>
