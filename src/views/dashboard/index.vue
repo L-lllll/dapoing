@@ -3,6 +3,8 @@ import { ref, onMounted } from 'vue'
 import {getRentAdvent,getHomeInfo} from '@/api/dashboard'
 // import AnnualRevenue from './annualRevenue.vue';
 import AnTv from './AnTv.vue'
+import ModalIndex from '../property/components/modalIndex.vue';
+// import addContract from './add-contract.vue';
 // 临期合同提醒
 const columns = ref([
   {
@@ -67,6 +69,22 @@ const onChange = (pageSize,page) => {
   rentAdventPage.value.pageSize = pageSize
   getRentAdventAPI()
 }
+
+// 弹窗
+// const visible = ref(false)
+// const infoForm = ref({})
+
+// const relet = (record) => {
+//   infoForm.value = {
+//     buildingName: record.buildingName,
+//     endTime: record.endTime,
+//     buildingId: record.buildingId,
+//     enterpriseId: record.enterpriseId
+//   }
+//   visible.value = true
+// }
+// 添加账单
+const visible = ref(false)
 </script>
 
 <template>
@@ -108,7 +126,7 @@ const onChange = (pageSize,page) => {
               <template v-if="column.key === 'index'">{{ index + 1 }}</template>
               <template v-if="column.key === 'time'">{{ record.startTime }}至{{ record.endTime }}</template>
               <template v-if="column.key === 'operation'">
-                <a-button type="text" style="color:#4770ff">续租</a-button>
+                <a-button type="text" style="color:#4770ff" >续租</a-button>
                 <a-button type="text" style="color:#4770ff">退租</a-button>
               </template>
             </template>
@@ -131,15 +149,15 @@ const onChange = (pageSize,page) => {
         <div class="fast">
           <h2>快捷入口</h2>
           <ul>
-            <li>
+            <li @click="$router.push('/addEnterprise')">
               <img src="../../assets/common/下载.png" alt="">
               <h3>添加企业</h3>
             </li>
-            <li>
+            <li @click="$router.push('/staffpage')">
               <img src="../../assets/common/下载 (2).png" alt="">
               <h3>员工管理</h3>
             </li>
-            <li>
+            <li @click="visible = true">
               <img src="../../assets/common/下载 (3).png" alt="">
               <h3>添加账单</h3>
             </li>
@@ -155,11 +173,13 @@ const onChange = (pageSize,page) => {
           <div class="cont" v-if="false">
           </div>
           <img src="./../../assets/common/Empty.png" alt="">
-          <a-button type="primary">更多></a-button>
+          <a-button type="primary" @click="$router.push('/warning')">更多></a-button>
         </div>
       </div>
     </div>
   </div>
+  <!-- <add-contract v-model:visible="visible" v-model:infoForm="infoForm"></add-contract> -->
+  <ModalIndex v-model:visible="visible"></ModalIndex>
 </template>
 
 <style lang="less" scoped>

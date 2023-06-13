@@ -1,5 +1,7 @@
 <template>
-  <div id="container" style="width: 100%;height: 100%;"></div>
+  <div class="containerBox">
+    <div id="container" style="width: 100%;min-height: 384px;"></div>
+  </div>
 </template>
 
 <script>
@@ -82,3 +84,8 @@ export default {
   },
 }
 </script>
+<style>
+  .containerBox {
+    min-height: 384px;
+  }
+</style>

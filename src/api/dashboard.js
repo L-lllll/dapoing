@@ -7,3 +7,7 @@ export const getRentAdvent = (parmas) => {
 export const getHomeInfo = (parmas) => {
   return request.get('home/workbench/info',{parmas})
 }
+// 续租合同
+export const getEnableBuilding = () => {
+  return request.get('park/rent/building')
+}
