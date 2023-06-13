@@ -50,8 +50,8 @@ const getWarnListAPI = async() => {
  }
 const getDetail = async(id) =>{
   const res = await getWarnDetail(id)
-  console.log(res)
-  console.log(id)
+  // console.log(res)
+  // console.log(id)
   setId(res)
   router.push({
     path:'/warningPageDetail',
