@@ -1,6 +1,6 @@
 <script setup>
 import {ref,onMounted} from 'vue'
-import {getEnterpriseList,getRentList,getBulidingList,updateFile,addContract,delEnterprise,delRent} from '@/api/enterPrise.js'
+import {getEnterpriseList,getRentList,getBulidingList,updateFile,addContract,delEnterprise,delRent,rentingInterface} from '@/api/enterPrise.js'
 import { UploadOutlined,CheckCircleFilled} from '@ant-design/icons-vue';
 import {Modal,message} from 'ant-design-vue'
 import dayjs from 'dayjs';
@@ -30,8 +30,7 @@ const getEnterpriseListAPI = async() => {
 // 获取租赁列表
 const innerData = ref([])
 const getRentListAPI = async(id) => {
-  const res = await getRentList(id)
-  innerData.value = res
+  innerData.value = await getRentList(id)
 }
 const expandedRowKeys = ref([]);
 const getSonTable = (expanded, record) => {
@@ -41,14 +40,18 @@ const getSonTable = (expanded, record) => {
        //返回某个指定的字符串值在字符串中首次出现的位置，下标为0
         let index = expandedRowKeys.value.indexOf(record.id);
         if (index > -1) { //如果出现则截取这个id,1d到1相当于0，针对重复点击一个
-          expandedRowKeys.value.splice(index, 1);
+          expandedRowKeys.value.splice(index, 1)
         } else {
         //如果没出现则截取所有id,添加点击id，0到1，针对已经有一个展开，点另一个会进入判断
+        modalList.value.enterpriseId=record.id
+        // console.log(record)
           getRentListAPI(record.id)
           expandedRowKeys.value.splice(0, expandedRowKeys.value.length);
           expandedRowKeys.value.push(record.id)
         }
       } else {
+        // console.log(record)
+        modalList.value.enterpriseId=record.id
         getRentListAPI(record.id)
         //数组长度小于0，说明都没展开，第一次点击，id添加到数组，数组有谁的id谁就展开
         expandedRowKeys.value.push(record.id);  
@@ -147,8 +150,13 @@ const changeDomal = async(id) => {
 // 选取的时间发生改变
 const times = ref(null)
 const onTimeChange = (value) => {
-  modalList.value.startTime = dayjs(value[0]).format('YYYY-MM-DD')
-  modalList.value.endTime = dayjs(value[1]).format('YYYY-MM-DD')
+  if(modalList.value.type === 0) {
+    modalList.value.startTime = dayjs(value[0]).format('YYYY-MM-DD')
+    modalList.value.endTime = dayjs(value[1]).format('YYYY-MM-DD')
+  }else {
+    modalList.value.endTime = dayjs(value[1]).format('YYYY-MM-DD')
+  }
+
 }
 // 上传文件
 const beforeUpload = (file) => {
@@ -178,6 +186,8 @@ const handleOk = async() => {
   if(modalList.value.type === 0) {
       try{
       await addContract(modalList.value)
+      await getEnterpriseList(list.value)
+      await getRentListAPI(modalList.value.enterpriseId)
       message.success('添加合同成功')
       onCancel()
     }catch(e){ /* empty */ }
@@ -186,6 +196,8 @@ const handleOk = async() => {
   else {
     try{
       await addContract(modalList.value)
+      await getEnterpriseList(list.value)
+      await getRentListAPI(modalList.value.enterpriseId)
       message.success('续约合同成功')
       onCancel()
     }catch(e){ /* empty */ }
@@ -213,13 +225,31 @@ const onCancel = () => {
 // 续租
 const renewal = async(record) => {
   // 续租有初始租赁楼宇和起始时间
+  console.log(record)
   try{
   modalList.value.type = 1
   modalList.value.buildingId = record.buildingId
-  modalList.value.startTime = record.startTime
+  // 终止时间+1等于起始时间转换
+  const originalDate = new Date(record.endTime)
+  originalDate.setDate(originalDate.getDate() + 1)
+  const nextDayStr = originalDate.toISOString().slice(0, 10)
+  modalList.value.startTime = nextDayStr
   showDomal.value = true
   await getBulidingList()
   }catch(e){ /* empty */ }
+}
+// 点击退租
+const rentingInterfaceAPI = async(id) => {
+  Modal.confirm({
+    title:'提示',
+    content: '是否确认退租?',
+    async onOk(){
+        await rentingInterface(id)
+        await getEnterpriseList(list.value)
+        await getRentListAPI(modalList.value.enterpriseId)
+        message.success("退租成功")
+      }
+  })
 }
 // 删除企业
 const delEnterpriseAPI = (id) => {
@@ -228,6 +258,7 @@ const delEnterpriseAPI = (id) => {
     content: '是否确认删除当前企业?',
     async onOk(){
         await delEnterprise(id)
+        getEnterpriseListAPI()
         message.success("删除企业成功")
       }
   })
@@ -239,6 +270,8 @@ const delRentAPI = (id) => {
     content: '是否确认删除当前合同?',
     async onOk(){
         await delRent(id)
+        await getEnterpriseList(list.value)
+        await getRentListAPI(modalList.value.enterpriseId)
         message.success("删除合同成功")
       }
   })
@@ -254,7 +287,13 @@ const gotoWatch = (id) => {
     query:{id:id,type:'watch'}
   })
 }
-
+// 跳转编辑企业
+const gotoChange = id => {
+  router.push({
+    path:'/addEnterprise',
+    query:{id:id,type:'change'}
+  })
+}
 // 挂载调用
 onMounted(() => {
   getEnterpriseListAPI()
@@ -284,7 +323,7 @@ onMounted(() => {
           <template v-if="column.key === 'action'">
            <a-button type="link" style="padding: 4px 15px 4px 0;" @click="changeDomal(record.id)">添加合同</a-button>
            <a-button type="link" style="padding: 4px 15px 4px 0;" @click="gotoWatch(record.id)">查看</a-button>
-           <a-button type="link" style="padding: 4px 15px 4px 0;">编辑</a-button>
+           <a-button type="link" style="padding: 4px 15px 4px 0;" @click="gotoChange(record.id)">编辑</a-button>
            <a-button 
            :disabled="record.existContractFlag == 1 ? true : false" 
            type="link" 
@@ -312,7 +351,7 @@ onMounted(() => {
               </template>
               <template v-if="column.key === 'action'">
                 <a-button :disabled="record.renewFlag === 0 ? true : false" type="link" style="padding: 4px 15px 4px 0;" @click="renewal(record)">续租</a-button>
-                <a-button :disabled="record.exitFlag === 0 ? true : false" type="link" style="padding: 4px 15px 4px 0;">退租</a-button>
+                <a-button :disabled="record.exitFlag === 0 ? true : false" type="link" style="padding: 4px 15px 4px 0;" @click="rentingInterfaceAPI(record.id)">退租</a-button>
                 <a-button :disabled="record.exitFlag === 0 ? false : true" type="link" style="padding: 4px 15px 4px 0;" @click="delRentAPI(record.id)">删除</a-button>
               </template> 
             </template>

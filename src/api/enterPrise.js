@@ -68,3 +68,29 @@ export const eterpriseInfo = id => {
     url:`park/enterprise/${id}`
   })
 }
+// 编辑企业
+export const changeEterprise = data => {
+  return request({
+    url:'park/enterprise',
+    method:'put',
+    data
+  })
+}
+// 下载接口
+export const downloadInfo = id => {
+  return request({
+    url:`download/${id}`,
+    method:'post',
+    responseType: 'blob',
+    data: {
+      isFormUrlEncoded: true // 添加此字段来标识当前接口需要使用 application/x-www-form-urlencoded 格式传输数据
+    }
+  })
+}
+// 退租接口
+export const rentingInterface = id => {
+  return request({
+    url:`park/enterprise/rent/${id}`,
+    method:'put'
+  })
+}
