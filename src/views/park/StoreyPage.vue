@@ -82,7 +82,7 @@ const searchBtn = () => {
       </a-space>
     </div>
     <div class="search-table__main">
-      <a-button type="primary"  style="border-radius: 4px;margin-bottom: 20px;" @click="showDialog = true">添加楼宇</a-button>
+      <a-button type="primary"  style="border-radius: 4px;margin-bottom: 5px;" @click="showDialog = true">添加楼宇</a-button>
       <add-buliding :showDialog="showDialog"></add-buliding>
       <!-- 表单区域 -->
       <a-table :dataSource="list" :columns="columns" :pagination="false">
