@@ -210,8 +210,8 @@ const delSome = ()=>{
       <template #bodyCell="{ record, column }">
         <template v-if="column.dataIndex === 'operate'">
           <a-space>
-            <a-button type="primary" size="small"  @click="editOneAPI(record)">编辑</a-button>
-            <a-button size="small" @click="delOneAPI(record.id)">删除</a-button>
+            <a-button type="link"  size="small"  @click="editOneAPI(record)" >编辑</a-button>
+            <a-button type="link" @click="delOneAPI(record.id)">删除</a-button>
           </a-space>
         </template>
         <template v-if="column.dataIndex === 'poleStatus'">

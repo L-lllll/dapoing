@@ -165,7 +165,6 @@ const updated = async(e) => {
     const formData = new FormData()
     formData.append('file', file.originFileObj, file.name);
     formData.append('type','contract')
-    e.file.status = 'success'
     const res = await updateFile(formData)
     modalList.value.contractUrl = res.url
     modalList.value.contractId = res.id
@@ -248,6 +247,14 @@ const delRentAPI = (id) => {
 const gotoAddEnterprise = () => {
   router.push('/addEnterprise')
 }
+// 跳转查看企业
+const gotoWatch = (id) => {
+  router.push({
+    path:'/addEnterprise',
+    query:{id:id,type:'watch'}
+  })
+}
+
 // 挂载调用
 onMounted(() => {
   getEnterpriseListAPI()
@@ -276,7 +283,7 @@ onMounted(() => {
         <template #bodyCell="{ record,column,index }">
           <template v-if="column.key === 'action'">
            <a-button type="link" style="padding: 4px 15px 4px 0;" @click="changeDomal(record.id)">添加合同</a-button>
-           <a-button type="link" style="padding: 4px 15px 4px 0;">查看</a-button>
+           <a-button type="link" style="padding: 4px 15px 4px 0;" @click="gotoWatch(record.id)">查看</a-button>
            <a-button type="link" style="padding: 4px 15px 4px 0;">编辑</a-button>
            <a-button 
            :disabled="record.existContractFlag == 1 ? true : false" 
