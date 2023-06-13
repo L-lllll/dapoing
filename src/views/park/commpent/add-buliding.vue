@@ -62,7 +62,7 @@ const showTitle = computed(() => {
 })
 </script>
 <template>
- <div>
+ <div class="ant-modal">
    <a-modal :footer="null" :visible="props.showDialog" @cancel="close" :title="showTitle" >
     <a-form
       ref="formRef"
@@ -76,7 +76,7 @@ const showTitle = computed(() => {
         <a-input v-model:value="formData.name" placeholder="请输入楼宇名称"></a-input>
       </a-form-item>
       <a-form-item name="floors" label="楼宇层数">
-        <a-input v-model:value="formData.floors" placeholder="请输入楼宇层数"></a-input>
+        <a-input-number v-model:value="formData.floors" placeholder="请输入楼宇层数" style="width:100%;" :min="1" :max="20"></a-input-number>
       </a-form-item>
       <a-form-item name="area" label="在管面积">
         <a-input v-model:value="formData.area" placeholder="请输入在管面积" addon-after="㎡"></a-input>
@@ -86,7 +86,7 @@ const showTitle = computed(() => {
       </a-form-item>
       <a-form-item>
         <div class="ant-modal-footer">
-          <a-row type="flex">
+          <a-row type="flex" justify="end">
             <a-space>
               <a-button style="border-radius: 10px" @click="close">取消</a-button>
               <a-button style="border-radius: 10px" type="primary" html-type="submit">确定</a-button >
@@ -100,6 +100,9 @@ const showTitle = computed(() => {
 </template>
 
 <style scoped>
+.ant-modal {
+  border-radius: 8px;
+}
 .ant-modal-footer {
   /* background-color: rgb(244, 246, 248); */
   padding: 10px 16px;
