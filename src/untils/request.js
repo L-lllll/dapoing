@@ -7,8 +7,11 @@ const request = axios.create({
   baseURL: '/api'
 })
 // 请求拦截器
-request.interceptors.request.use(config => {
+request.interceptors.request.use((config) => {
   const { token } = useToken()
+  if (config.data && config.data.isFormUrlEncoded) {
+    config.headers['Content-Type'] = 'application/x-www-form-urlencoded';
+  }
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }
@@ -21,6 +24,7 @@ request.interceptors.request.use(config => {
 // 响应拦截器
 request.interceptors.response.use(
   response => {
+    if (response.data instanceof Blob) return response.data
     const { code, msg, data } = response.data
     if (code === 10000) {
       return data 

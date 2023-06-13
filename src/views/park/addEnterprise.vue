@@ -3,7 +3,8 @@ import {ref,onMounted,computed } from 'vue'
 import {ArrowLeftOutlined,CheckCircleFilled,UploadOutlined} from '@ant-design/icons-vue';
 import { useRouter } from 'vue-router'; 
 import {message} from 'ant-design-vue';
-import {updateFile,industry,addeEterprise,eterpriseInfo} from '@/api/enterPrise.js'
+import {updateFile,industry,addeEterprise,eterpriseInfo,changeEterprise,downloadInfo} from '@/api/enterPrise.js'
+import FileSaver from 'file-saver'
 const router = useRouter()
 // 返回
 const goback = () => {
@@ -85,26 +86,90 @@ const btnCancel = () => {
   fileList.value = null
 }
 const btnOk = async() => {
-  const res = await addeEterprise(formData.value)
-  console.log(formData.value)
-  console.log(res)
-  message.success('公司新增成功')
-  goback()
+  if(type.value === 'change') {
+    try{
+      await changeEterprise(formData.value)
+      message.success('编辑成功')
+      goback()
+    }catch(e) {
+      message.error(e.message)
+      // console.dir(e)
+    }
+  }else{
+    await addeEterprise(formData.value)
+    message.success('公司新增成功')
+    goback()
+  }
 }
 // 查看跳转区域
 const watchId = ref(router.currentRoute.value.query.id)
 const type = ref(router.currentRoute.value.query.type)
 // 获取企业信息
 const eterpriseInfoAPI = async() => {
-  formData.value = await eterpriseInfo(router.currentRoute.value.query.id)
-  console.log(formData.value)
+  if(type.value === 'watch') {
+    formData.value = await eterpriseInfo(router.currentRoute.value.query.id)
+  }else {
+    const res = await eterpriseInfo(router.currentRoute.value.query.id)
+    console.log(res)
+    formData.value.name = res.name
+    formData.value.legalPerson = res.legalPerson
+    formData.value.registeredAddress = res.registeredAddress
+    formData.value.industryCode = res.industryCode
+    formData.value.businessLicenseUrl = res.businessLicenseUrl
+    formData.value.businessLicenseId = res.businessLicenseId
+    formData.value.contact = res.contact
+    formData.value.contactNumber = res.contactNumber
+    formData.value.id = watchId
+    // fileList.value = res.businessLicenseName
+  }
 }
-
+// 租赁记录
+const columns = ref([
+{
+  title:'序号',
+  key: 'number',
+},{
+  title: '租赁楼宇',
+  dataIndex: 'name',
+  key: 'name',
+},
+{
+  title: '合同状态',
+  dataIndex: 'status',
+  key: 'status',
+},
+{
+  title: '租赁起止时间',
+  dataIndex: 'time',
+  key: 'time',
+},
+{
+  title: '租赁合同',
+  dataIndex: 'contractName',
+  key: 'contractName',
+  width:'20%'
+},
+{
+  title: '录入时间',
+  dataIndex: 'createTime',
+  key: 'createTime',
+},
+{
+  title: '操作',
+  dataIndex: 'action',
+  key: 'action',
+},
+])
+// 下载导出
+const downloadInfoAPI = async(id,name) => {
+  // console.log(id)
+  const data = await downloadInfo(id)
+  FileSaver.saveAs(data, name)
+}
 
 // 挂载调用
 onMounted(() => {
   industryAPI()
-  console.log(watchId,type)
   if(watchId.value) {
     eterpriseInfoAPI()
   }
@@ -132,13 +197,13 @@ onMounted(() => {
           <a-row >
             <a-col :span="12" style="padding: 0 16px;">
               <a-form-item label="企业名称" :label-col="{ span: 4 }" name="name">
-                <a-input v-if="type === watch" style="width: 80%;" v-model:value="formData.name" placeholder="请输入企业名称"></a-input>
+                <a-input v-if="type !== 'watch'" style="width: 80%;" v-model:value="formData.name" placeholder="请输入企业名称"></a-input>
                 <span v-else style="margin-left: 10px;">{{ formData.name }}</span>
               </a-form-item>
             </a-col>
             <a-col :span="12" style="padding: 0 16px;">
               <a-form-item label="法人" :label-col="{ span: 4 }" name="legalPerson">
-                <a-input v-if="type === watch" style="width: 80%;" v-model:value="formData.legalPerson" placeholder="请输入法人"></a-input>
+                <a-input v-if="type !== 'watch'" style="width: 80%;" v-model:value="formData.legalPerson" placeholder="请输入法人"></a-input>
                 <span v-else style="margin-left: 10px;">{{ formData.legalPerson }}</span>
               </a-form-item>
             </a-col>
@@ -146,13 +211,13 @@ onMounted(() => {
           <a-row>
             <a-col :span="12" style="padding: 0 16px;">
               <a-form-item label="注册地址" :label-col="{ span: 4 }" name="registeredAddress">
-                <a-input v-if="type === watch" style="width: 80%;" v-model:value="formData.registeredAddress" placeholder="请输入注册地址"></a-input>
+                <a-input v-if="type !== 'watch'" style="width: 80%;" v-model:value="formData.registeredAddress" placeholder="请输入注册地址"></a-input>
                 <span v-else style="margin-left: 10px;">{{ formData.registeredAddress }}</span>
               </a-form-item>
             </a-col>
             <a-col :span="12" style="padding: 0 16px;">
               <a-form-item label="所在行业" :label-col="{ span: 4 }" name="industryCode">
-                <a-select v-if="type === watch" v-model:value="formData.industryCode" style="width: 80%;" placeholder="请选择所在行业">
+                <a-select v-if="type !== 'watch'" v-model:value="formData.industryCode" style="width: 80%;" placeholder="请选择所在行业">
                   <a-select-option v-for="item in industryList" :key="item.industryCode">{{ item.industryName }}</a-select-option>
                 </a-select>
                 <span v-else style="margin-left: 10px;">{{ formData.industryName }}</span>
@@ -162,8 +227,9 @@ onMounted(() => {
           <a-row>
             <a-col :span="12" style="padding: 0 16px;">
               <a-form-item label="营业执照" :label-col="{ span: 4 }" name="businessLicenseUrl">
-                <div style="width:80%" v-if="type === watch">
+                <div style="width:80%" >
                   <a-upload 
+                  v-if="type !== 'watch'"
                    v-model:file-list="fileList" 
                    action=""
                    :before-upload="beforeUpload"
@@ -175,17 +241,18 @@ onMounted(() => {
                        上传文件
                      </a-button>
                      <a-tag color="green" style="font-size: 14px;padding: 4px 15px;" v-else><CheckCircleFilled/>已上传</a-tag>
-                     <template #itemRender="{ file, actions }">
+                     <template #itemRender="{ file}">
                        <a-space>
                          <span>{{ file.name }}</span>
-                         <a href="javascript:;" @click="actions.download">下载</a>
+                         <a href="javascript:;">下载</a>
                          <a href="javascript:;" @click="fileList = null">删除</a>
                        </a-space>
                      </template>
                    </a-upload>
+                   <img v-if="fileList === null || style !== change" :src="formData.businessLicenseUrl" style="max-width:250px;margin-left: 10px;" alt="">
                       <div style="color: #00000073;margin-top: 8px;">支持扩展名：.png,.jpg,.jpeg, 文件大小不得超过5M</div>
                 </div>
-                <img :src="formData.businessLicenseUrl" style="max-width:250px;margin-left: 10px;" alt="">
+                
               </a-form-item>
             </a-col>
           </a-row>
@@ -196,36 +263,45 @@ onMounted(() => {
             <a-row>
               <a-col :span="12" style="padding: 0 16px;">
                 <a-form-item label="企业联系人:" :label-col="{ span: 4 }" name="contact">
-                  <a-input v-if="type === watch" style="width: 80%;" v-model:value="formData.contact"></a-input>
+                  <a-input v-if="type !== 'watch'" style="width: 80%;" v-model:value="formData.contact"></a-input>
                   <span v-else style="margin-left: 10px;">{{ formData.contact }}</span>
                 </a-form-item>
               </a-col>
               <a-col :span="12" style="padding: 0 16px;">
                 <a-form-item label="联系电话:" :label-col="{ span: 4 }" name="contactNumber">
-                  <a-input v-if="type === watch" style="width: 80%;" v-model:value="formData.contactNumber"></a-input>
+                  <a-input v-if="type !== 'watch'" style="width: 80%;" v-model:value="formData.contactNumber"></a-input>
                   <span v-else style="margin-left: 10px;">{{ formData.contactNumber }}</span>
                 </a-form-item>
               </a-col>
             </a-row>
           </div>
           <!-- 租赁记录 -->
-          <div class="enterpriseInfo" v-if="type !== watch">
+          <div class="enterpriseInfo" v-if="type === 'watch'">
           <span class="title"><span class="side"></span>租赁记录</span>
-          <a-table :columns="columns" :data-source="data">
-            <template #headerCell="{ column }">
-              <template v-if="column.key === 'name'">
+          <a-table :columns="columns" :data-source="formData.rent" :pagination="false">
+        
+            <template #bodyCell="{ column,record,index }">
+              <template v-if="column.key === 'number'">
                 <span>
-                  <smile-outlined />
-                  Name
+                  {{ index + 1 }}
                 </span>
               </template>
-            </template>
-        
-            <template #bodyCell="{ column, record }">
-              <template v-if="column.key === 'name'">
-                <a>
-                  {{ record.name }}
-                </a>
+              <template v-if="column.key === 'status'">
+                <a-tag v-if="record.status === 0" color="blue">待生效</a-tag>
+                <a-tag v-if="record.status === 1" color="green">生效中</a-tag>
+                <a-tag v-if="record.status === 2" color="red">已到期</a-tag>
+                <a-tag v-if="record.status === 3">已退租</a-tag>
+              </template>
+              <template v-if="column.key === 'time'">
+                <span>
+                  {{ record.startTime }}到{{ record.endTime }}
+                </span>
+              </template>
+              <template v-if="column.key === 'contractName'">
+                <a :href="record.contractUrl">{{ record.contractName }}</a>
+              </template>
+              <template v-if="column.key === 'action'">
+                <a @click="downloadInfoAPI(record.id,record.contractName)">合同下载</a>
               </template>
             </template>
           </a-table>
@@ -233,11 +309,11 @@ onMounted(() => {
       </a-form>
       </div>
     </a-layout-content>
-    <a-layout-footer v-if="type === watch" style="text-align: center;height: 80px;width: 100%;;position: fixed;bottom: 0;background-color: #fff;min-width: 1116px;">
-      <a-button style="margin-right: 20px;border-radius: 4px;" @click="btnCancel">重置</a-button>
+    <a-layout-footer v-if="type !== 'watch'" style="text-align: center;height: 80px;width: 100%;;position: fixed;bottom: 0;background-color: #fff;min-width: 1116px;">
+      <a-button style="margin-right: 20px;border-radius: 4px;" :disabled="type ? true : false" @click="btnCancel">重置</a-button>
       <a-button type="primary" style="border-radius: 4px;" @click="btnOk">确定</a-button>
     </a-layout-footer>
-    <div style="height: 80px;width: 100%;"></div>
+    <div style="height: 160px;width: 100%;"></div>
   </a-layout>
 </template>
 
@@ -273,5 +349,8 @@ onMounted(() => {
   width: 56px;
   font-size: 16px;
   cursor: pointer;
+}
+:deep(.ant-table-cell){
+  padding: 8px !important;
 }
 </style>
