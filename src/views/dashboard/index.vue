@@ -1,6 +1,8 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import {getRentAdvent} from '@/api/dashboard'
+import {getRentAdvent,getHomeInfo} from '@/api/dashboard'
+// import AnnualRevenue from './annualRevenue.vue';
+import AnTv from './AnTv.vue'
 // 临期合同提醒
 const columns = ref([
   {
@@ -33,14 +35,30 @@ const rentAdventPage = ref({
   page: 1,
   pageSize: 5
 })
+// 总收入
+const annualIncome = ref(0)
+// 企业总数
+const enterpriseTotal = ref(0)
+// 月卡总数
+const monthCardTotal = ref(0)
+// 一体杆总数
+const chargePoleTotal = ref(0)
 const totals = ref(0)
 onMounted(() => {
   getRentAdventAPI()
+  getHomeInfoAPI()
 })
 const getRentAdventAPI = async () => {
   const {total, rows} =  await getRentAdvent(rentAdventPage.value)
   rentAdvent.value = rows
   totals.value = total
+}
+const getHomeInfoAPI = async () => {
+  const res = await getHomeInfo()
+  annualIncome.value = res.annualIncome
+  enterpriseTotal.value = res.enterpriseTotal
+  monthCardTotal.value = res.monthCardTotal
+  chargePoleTotal.value = res.chargePoleTotal
 }
 
 //分页
@@ -61,25 +79,26 @@ const onChange = (pageSize,page) => {
           <ul>
             <li>
               <h3>年度累计收费（元）</h3>
-              <p>52351.96</p>
+              <p>{{annualIncome}}</p>
             </li>
             <li>
               <h3>入驻企业总数（个）</h3>
-              <p>6</p>
+              <p>{{enterpriseTotal}}</p>
             </li>
             <li>
               <h3>月卡车辆总数（辆）</h3>
-              <p>5</p>
+              <p>{{monthCardTotal}}</p>
             </li>
             <li>
               <h3>一体杆总数（台）</h3>
-              <p>52</p>
+              <p>{{chargePoleTotal}}</p>
             </li>
           </ul>
         </div>
         <!-- 年度收入统计 -->
         <div class="annualRevenue">
           <h2>年度收入统计</h2>
+          <AnTv></AnTv>
         </div>
         <!-- 临期合同提醒 -->
         <div class="arriveContract">
@@ -195,7 +214,7 @@ const onChange = (pageSize,page) => {
   }
   // 年度收入统计
   .annualRevenue {
-    height: 382px;
+    min-height: 382px;
   }
   //临期合同提醒
   .ant-table-wrapper {
@@ -281,7 +300,7 @@ const onChange = (pageSize,page) => {
     img {
       display: block;
       margin: 0 auto;
-      width: 60%;
+      width: 45%;
     }
   }
 } 

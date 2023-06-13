@@ -2,7 +2,9 @@
 import { ref, onMounted } from 'vue';
 import { getMouthList, getMouthCard,delMouthList } from '../../api/areaPage'
 import { Modal, message } from 'ant-design-vue'
-
+import { useRouter } from 'vue-router'; 
+const router = useRouter()
+// 表单
 const columns = [
   {
     title: '序号',
@@ -129,42 +131,95 @@ const columns = [
     }
   },
 ];
+// 跳转页面
+const goToAddMouth = () => {
+  router.push('/addmouth')
+}
+// 数据列表
 const mouthList = ref([])
+const infoData = ref({})
+const total = ref(null)
+const delId = ref('')
 // 获取月卡信息
 const getMouthCardAPI = async() => {
   const res = await getMouthCard()
-  console.log(res)
+  // console.log(res)
   infoData.value = res
 }
-const infoData = ref({})
-const total = ref(null)
+
 // 获取数据列表
 const getMouthListAPI = async() => {
   const res = await getMouthList(mouthForm.value)
   total.value = res.total
   mouthList.value = res.rows
-  console.log(mouthList.value)
+  // console.log(mouthList.value)
+}
+// 获取选中行的id
+const rowSelection = {
+  onChange: (selectedRowKeys) => {
+    // console.log(`1: ${selectedRowKeys}`, '选中的值: ', selectedRows);
+    delId.value = `${selectedRowKeys}`
+  }
+};
+// 批量删除
+const delMore = () => {
+  if(!delId.value) {
+    message.info('请选择月卡')
+  } else {
+    Modal.confirm({
+    content: '是否确定删除月卡',
+    async onOk(){
+      if(delId.value.includes(1) || delId.value.includes(2) || delId.value.includes(3) || delId.value.includes(4) || delId.value.includes(5)){
+        message.error('演示数据不允许操作')
+        getMouthListAPI()
+
+      } else {
+        await delMouthList(delId.value)
+        message.success('删除月卡成功')
+        getMouthListAPI()
+
+      }
+    }
+  })
+  }
 }
 // 删除月卡功能
 const delMouthAPI = (id) => {
-  console.log(id);
-  
+  console.log(id)
+
   Modal.confirm({
     content: '是否确定删除月卡',
     async onOk(){
-      await delMouthList(id)
-    if(id !== 1&& id !== 2 && id !== 3 && id !== 4 && id !== 5){
-      message.success('删除月卡成功')
+      if(id===1 || id===2 || id===3 || id===4 || id===5){
+        message.error('演示数据不允许操作')
+        getMouthListAPI()
+
+      } else {
+        await delMouthList(id)
+        message.success('删除月卡成功')
+        getMouthListAPI()
+      }
     }
-  }
-})
-getMouthListAPI()
+  })
 }
+
+// 改变每页条数
+const onShowSizeChange = (current, size) => {
+  mouthForm.value.page = current
+  mouthForm.value.pageSize = size
+  getMouthListAPI()
+};
+// 换页
+const onPageChange = (val) => {
+  mouthForm.value.page = val
+  getMouthListAPI()
+};
 // 搜索功能
 const serchList = () => {
   // console.log(mouthForm.value)
   getMouthListAPI()
 }
+// 搜索的表单数据
 const mouthForm = ref({
   page: 1,
   pageSize: 10,
@@ -198,8 +253,8 @@ onMounted(() => {
       </a-form-item>
     </a-form>
     <div class="box">
-      <a-button type="primary" style="margin-right: 10px;border-radius: 5px;">添加月卡</a-button>
-      <a-button type="primary" style="margin-right: 10px;border-radius: 5px;">批量删除</a-button>
+      <a-button type="primary" style="margin-right: 10px;border-radius: 5px;" @click="goToAddMouth">添加月卡</a-button>
+      <a-button type="primary" style="margin-right: 10px;border-radius: 5px;" @click="delMore">批量删除</a-button>
       <div class="info"><span class="icon">i</span> 本园区共计 {{infoData.spaceNumber}} 个车位, 月卡用户 {{infoData.cardCount}} 人, 车位占有率 {{ infoData.proportion }}</div>
     </div>
     <a-table
@@ -208,7 +263,8 @@ onMounted(() => {
      :ellipsis="true" 
      :columns="columns" 
      :data-source="mouthList"
-     :row-selection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
+     :row-selection="rowSelection"
+     rowKey="id"
      >
         <template #bodyCell="{ record,column,index }">
           <template v-if="column.dataIndex === 'name'">

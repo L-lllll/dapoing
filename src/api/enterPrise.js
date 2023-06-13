@@ -48,3 +48,23 @@ export const delRent = id => {
     method:'delete'
   })
 }
+// 所在行业
+export const industry = () => {
+  return request({
+    url:'park/industry'
+  })
+}
+// 增加企业
+export const addeEterprise = data => {
+  return request({
+    url:'park/enterprise',
+    method:'post',
+    data
+  })
+}
+// 查看企业信息
+export const eterpriseInfo = id => {
+  return request({
+    url:`park/enterprise/${id}`
+  })
+}
